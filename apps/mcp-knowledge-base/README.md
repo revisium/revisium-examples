@@ -2,6 +2,8 @@
 
 Use Revisium Cloud as a structured knowledge base that AI agents can inspect through MCP.
 
+The runnable MCP server lives in [`project/`](./project/README.md); this folder keeps the bootstrap config, seed data, and example metadata.
+
 ## What This Shows
 
 - MCP access to live Revisium projects

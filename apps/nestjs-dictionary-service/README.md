@@ -2,6 +2,8 @@
 
 Use Revisium as a typed reference-data service behind a NestJS backend.
 
+The runnable app lives in [`project/`](./project/README.md); this folder keeps the bootstrap config, seed data, and example metadata.
+
 ## What This Shows
 
 - dictionary/reference data stored outside the transactional application database
