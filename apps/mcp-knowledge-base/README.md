@@ -32,7 +32,11 @@ and seed data stay at this example root, while `project/` contains the runnable 
 | 5 | `cd apps/mcp-knowledge-base/project && cp .env.example .env && npm install` | Prepare MCP server env and dependencies |
 | 6 | `npm run build` | Build MCP server |
 | 7 | `npm start` | Run MCP server |
-| 8 | `claude mcp add revisium-kb --env REVISIUM_URL="$(grep '^REVISIUM_URL=' .env | cut -d= -f2-)" -- node "$(pwd)/dist/main.js"` | Register this stdio MCP server |
+| 8 | Register this stdio MCP server | Use the command below from `apps/mcp-knowledge-base/project` |
+
+```bash
+claude mcp add revisium-kb --env REVISIUM_URL="$(grep '^REVISIUM_URL=' .env | cut -d= -f2-)" -- node "$(pwd)/dist/main.js"
+```
 
 ## See and Manage Data
 
