@@ -2,7 +2,7 @@
 
 Read client-facing feature flags from Revisium without redeploying a React app.
 
-The runnable app lives in [`project/`](./project/README.md); this folder keeps the bootstrap config, seed data, and example metadata.
+The runnable app lives in [`project/`](./project/README.md); bootstrap config and seed data stay at this example root, while `project/` contains the runnable app.
 
 ## What This Shows
 

@@ -117,7 +117,7 @@ Each example must include:
 - `README.md` following [`templates/example/README.md`](./templates/example/README.md)
 - `example.json` metadata for the website/docs catalog
 - application examples: `.env.example`, `bootstrap.config.json`, and `scripts/bootstrap.mjs`
-- runnable app examples: `project/README.md`, `project/package.json`, and source files under `project/src/`
+- runnable app examples: `project/README.md`, `project/package.json`, and source files under `project/src/`, `project/app/`, `project/pages/`, or another framework-standard source folder.
 - application `.env.example` files should use one `REVISIUM_URL` in `revisium://host/org/project/branch` format
 - framework app code should stay minimal here; full runnable apps belong in separate project repositories
 - no real secrets or customer data
