@@ -25,7 +25,7 @@ The comparison point is not only a CMS. It is also Prisma-style developer experi
 ## Funnel
 
 1. `revisium.io` shows the problem and the category: structured data with versioning, generated APIs, and MCP.
-2. `docs.revisium.io/quick-start` gets the first project created.
+2. `docs.revisium.io/quick-start` gets the first project created in local standalone.
 3. `docs.revisium.io/examples` routes by stack and use case.
 4. GitHub example README gives copyable setup.
 5. Cloud CTA appears where the user reaches "production/staging" or "managed" steps.
@@ -47,7 +47,7 @@ Build these first:
 1. `nestjs-dictionary-service`
    - generated OpenAPI client
    - FAQ/category seed data
-   - standalone and Cloud env files
+   - standalone and Docker Compose mutation flow
    - one smoke test
 2. `nextjs-remote-config`
    - App Router
@@ -56,7 +56,7 @@ Build these first:
 3. `mcp-knowledge-base`
    - local seed script for `facts`, `decisions`, `tasks`
    - MCP prompt examples
-   - Cloud read-only walkthrough
+   - local-first MCP + optional Cloud inspection
 
 ### Phase 3: Assets
 
@@ -81,7 +81,7 @@ An example is public-marketing-ready only when it has:
 - one command or clearly bounded setup
 - `.env.example`
 - no hidden credentials
-- standalone and Cloud notes
+- standalone-first notes, plus Cloud consume path
 - screenshots or terminal output
 - one verification command
 - docs links

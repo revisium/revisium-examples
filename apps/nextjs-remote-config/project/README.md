@@ -31,15 +31,9 @@ REVISIUM_URL=revisium://cloud.revisium.io/my-org/web-config/master:head?apikey=r
 
 ## Run
 
-First bootstrap the Revisium project from the catalog repository:
+Bootstrap is done from the example root (`npm run bootstrap:nextjs`).
 
-```bash
-cd ../../../
-npm install
-npm run bootstrap:nextjs
-```
-
-Then run this app from the repo root:
+Run this app in a separate command after revisium bootstrap:
 
 ```bash
 cd apps/nextjs-remote-config/project

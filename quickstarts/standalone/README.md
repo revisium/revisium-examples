@@ -40,6 +40,17 @@ Open:
 
 Default local credentials are `admin` / `admin` unless overridden by environment variables.
 
+### Multiple demos
+
+Use one Standalone process for multiple examples and keep it listening on `:9222`.
+Each app can target its own project under the same local org (`admin`) via different
+`REVISIUM_URL` values.
+
+```bash
+curl -fsS http://localhost:9222 >/dev/null && echo "standalone is already running" || echo "start standalone first"
+lsof -iTCP:9222 -sTCP:LISTEN
+```
+
 ## Architecture
 
 ```mermaid

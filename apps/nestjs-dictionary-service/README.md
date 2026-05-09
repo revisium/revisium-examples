@@ -2,7 +2,12 @@
 
 Use Revisium as a typed reference-data service behind a NestJS backend.
 
-The runnable app lives in [`project/`](./project/README.md); bootstrap config and seed data stay at this example root, while `project/` contains the runnable app.
+This example is designed for local writable development first. Keep mutations in
+**standalone** or **Docker Compose** and treat Cloud as consumer-mode unless you
+have an explicit requirement for hosted writes.
+
+The runnable app lives in [`project/`](./project/README.md). Bootstrap config,
+seed rows, and environment contract stay at this example root.
 
 ## What This Shows
 
@@ -15,9 +20,9 @@ The runnable app lives in [`project/`](./project/README.md); bootstrap config an
 
 | Mode | URL | Notes |
 | --- | --- | --- |
-| Standalone | `http://localhost:9222` | Local development |
-| Docker Compose | `http://localhost:8080` | Local service parity with PostgreSQL |
-| Revisium Cloud | `https://cloud.revisium.io` | Managed staging or production |
+| Standalone | `http://localhost:9222` | Local development (mutable) |
+| Docker Compose | `http://localhost:8080` | Local self-hosted service parity |
+| Revisium Cloud | `https://cloud.revisium.io` | Managed read/consume mode |
 
 ## Prerequisites
 
@@ -110,17 +115,28 @@ revisium://[user:password@]host[:port]/organization/project/branch[:revision][?t
 
 ```env
 REVISIUM_URL=revisium://your-username:your-password@localhost:9222/admin/dictionary/master
-REVISIUM_REST_ENDPOINT=http://localhost:9222/endpoint/rest/admin/dictionary/master/head
-REVISIUM_GRAPHQL_ENDPOINT=http://localhost:9222/endpoint/graphql/admin/dictionary/master/head
 ```
 
-Cloud mode keeps the same shape and carries the API key in the URL:
+Cloud mode keeps the same shape and carries the API key in the URL. Read/write should be done via local revisium unless you specifically deploy writable Cloud access:
 
 ```env
 REVISIUM_URL=revisium://cloud.revisium.io/my-org/dictionary/master?apikey=rev_xxx
-REVISIUM_REST_ENDPOINT=https://cloud.revisium.io/endpoint/rest/my-org/dictionary/master/head
-REVISIUM_GRAPHQL_ENDPOINT=https://cloud.revisium.io/endpoint/graphql/my-org/dictionary/master/head
 ```
+
+## See and Manage Data
+
+Use these URLs after bootstrap:
+
+- Admin UI: `http://localhost:9222`
+- Generated REST API:
+  `http://localhost:9222/endpoint/rest/admin/dictionary/master/head`
+- Generated GraphQL API:
+  `http://localhost:9222/endpoint/graphql/admin/dictionary/master/head`
+- Docker Compose equivalent REST base:
+  `http://localhost:8080/endpoint/rest/admin/dictionary/master/head`
+
+For mutation workflows, use standalone/docker-compose and keep `REVISIUM_URL` aligned to
+that instance.
 
 ## Developer Context
 
@@ -154,15 +170,27 @@ In a real NestJS app, put this behind a small `DictionaryService` and keep URL p
 
 | Step | Command | Notes |
 | --- | --- | --- |
-| 1 | `cp apps/nestjs-dictionary-service/.env.example apps/nestjs-dictionary-service/.env` | Fill one `REVISIUM_URL` |
-| 2 | `npm install` | Install repo validation and bootstrap tooling |
-| 3 | `npm run bootstrap:nestjs` | Create Revisium tables, seed rows, and REST/GraphQL endpoints |
-| 4 | Copy the service snippet into your NestJS app | Keep the full app in its own project repository |
+| 1 | `npm install` | Install repo tooling and shared helper script |
+| 2 | `cp apps/nestjs-dictionary-service/.env.example apps/nestjs-dictionary-service/.env` | Fill one `REVISIUM_URL` for standalone (default) |
+| 3 | `npx @revisium/standalone@latest` | Start writable local Revisium (`:9222`) |
+| 4 | `npm run bootstrap:nestjs` | Create tables, rows, and `REST_API`/`GRAPHQL` endpoints |
+| 5 | `cd apps/nestjs-dictionary-service/project && npm install` | Install app dependencies |
+| 6 | `npm run build && npm run start` | Run the NestJS app |
+| 7 | `curl -fsS http://localhost:3000/faq` | Smoke test app output |
+| 8 | `curl -fsS http://localhost:9222/endpoint/rest/admin/dictionary/master/head/FaqItem` | Confirm schema data in Revisium |
 
 ```bash
 cp apps/nestjs-dictionary-service/.env.example apps/nestjs-dictionary-service/.env
 npm install
+# terminal 1
+npx @revisium/standalone@latest
+
+# terminal 2
 npm run bootstrap:nestjs
+cd apps/nestjs-dictionary-service/project
+npm install
+npm run build
+npm run start
 ```
 
 ## Verify
