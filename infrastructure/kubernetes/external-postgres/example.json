@@ -1,0 +1,10 @@
+{
+  "id": "external-postgres",
+  "title": "External PostgreSQL",
+  "path": "infrastructure/kubernetes/external-postgres",
+  "category": "infrastructure",
+  "status": "reference",
+  "modes": ["kubernetes"],
+  "useCases": ["database", "production"],
+  "docs": "https://docs.revisium.io/deployment"
+}

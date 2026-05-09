@@ -1,0 +1,10 @@
+{
+  "id": "example-id",
+  "title": "Example Title",
+  "path": "apps/example-id",
+  "category": "application",
+  "status": "bootstrap",
+  "modes": ["standalone", "docker", "cloud"],
+  "useCases": ["dictionary-service"],
+  "docs": "https://docs.revisium.io"
+}

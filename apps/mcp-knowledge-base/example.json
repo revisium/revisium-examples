@@ -1,0 +1,10 @@
+{
+  "id": "mcp-knowledge-base",
+  "title": "MCP Knowledge Base",
+  "path": "apps/mcp-knowledge-base",
+  "category": "application",
+  "status": "researched",
+  "modes": ["cloud", "standalone", "docker"],
+  "useCases": ["ai-agent-memory", "knowledge-base", "mcp"],
+  "docs": "https://docs.revisium.io/apis/mcp"
+}

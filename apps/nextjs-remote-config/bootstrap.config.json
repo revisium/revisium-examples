@@ -1,0 +1,189 @@
+{
+  "defaultUrl": "revisium://localhost:9222/admin/web-config/master",
+  "organizationId": "admin",
+  "projectName": "web-config",
+  "branchName": "master",
+  "commitMessage": "Bootstrap Next.js remote config example",
+  "endpoints": ["REST_API", "GRAPHQL"],
+  "tables": [
+    {
+      "id": "FeatureFlag",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "enabled": { "type": "boolean", "default": false },
+          "rollout": { "type": "number", "default": 0 },
+          "description": { "type": "string", "default": "" },
+          "segments": { "type": "array", "items": { "type": "string", "default": "" } },
+          "isFullyRolledOut": {
+            "type": "boolean",
+            "readOnly": true,
+            "x-formula": { "version": 1, "expression": "enabled && rollout >= 100" }
+          }
+        },
+        "required": ["enabled", "rollout", "description", "segments"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "Asset",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "default": "" },
+          "file": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" }
+        },
+        "required": ["title"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "PageCopy",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "default": "" },
+          "body": { "type": "string", "default": "", "contentMediaType": "text/markdown" },
+          "heroAssetId": { "type": "string", "default": "", "foreignKey": "Asset" },
+          "relatedPageIds": {
+            "type": "array",
+            "items": { "type": "string", "default": "", "foreignKey": "PageCopy" }
+          },
+          "ctas": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": { "type": "string", "default": "" },
+                "href": { "type": "string", "default": "" },
+                "flagId": { "type": "string", "default": "", "foreignKey": "FeatureFlag" }
+              },
+              "required": ["label", "href", "flagId"],
+              "additionalProperties": false
+            }
+          },
+          "media": {
+            "type": "object",
+            "properties": {
+              "heroImage": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" },
+              "gallery": {
+                "type": "array",
+                "items": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" }
+              }
+            },
+            "additionalProperties": false
+          },
+          "attachments": {
+            "type": "array",
+            "items": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" }
+          },
+          "primaryCtaLabel": {
+            "type": "string",
+            "readOnly": true,
+            "x-formula": { "version": 1, "expression": "ctas[0].label" }
+          },
+          "ctaCount": {
+            "type": "number",
+            "readOnly": true,
+            "x-formula": { "version": 1, "expression": "count(ctas)" }
+          }
+        },
+        "required": ["title", "body", "heroAssetId", "relatedPageIds", "ctas"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "Plan",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "default": "" },
+          "monthlyPrice": { "type": "number", "default": 0 },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "featuredFlagId": { "type": "string", "default": "", "foreignKey": "FeatureFlag" }
+            },
+            "required": ["featuredFlagId"],
+            "additionalProperties": false
+          },
+          "display": {
+            "type": "object",
+            "properties": {
+              "tone": { "type": "string", "default": "" },
+              "badge": {
+                "type": "string",
+                "readOnly": true,
+                "x-formula": { "version": 1, "expression": "/name + \" plan\"" }
+              }
+            },
+            "additionalProperties": false
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string", "default": "" },
+                "weight": { "type": "number", "default": 0 },
+                "flagId": { "type": "string", "default": "", "foreignKey": "FeatureFlag" }
+              },
+              "required": ["name", "weight", "flagId"],
+              "additionalProperties": false
+            }
+          },
+          "annualPrice": {
+            "type": "number",
+            "readOnly": true,
+            "x-formula": { "version": 1, "expression": "monthlyPrice * 12" }
+          },
+          "featureCount": {
+            "type": "number",
+            "readOnly": true,
+            "x-formula": { "version": 1, "expression": "count(features)" }
+          },
+          "featureWeightTotal": {
+            "type": "number",
+            "readOnly": true,
+            "x-formula": { "version": 1, "expression": "sum(features[*].weight)" }
+          }
+        },
+        "required": ["name", "monthlyPrice", "metadata", "features"],
+        "additionalProperties": false
+      }
+    }
+  ],
+  "rows": [
+    {
+      "tableId": "FeatureFlag",
+      "rowId": "pricing-banner",
+      "data": { "enabled": true, "rollout": 100, "description": "Show pricing banner", "segments": ["public", "trial"] }
+    },
+    {
+      "tableId": "Asset",
+      "rowId": "hero",
+      "data": { "title": "Homepage hero" }
+    },
+    {
+      "tableId": "PageCopy",
+      "rowId": "home-hero",
+      "data": {
+        "title": "Structured content with versioning",
+        "body": "Edit content in Revisium and read it from Next.js.",
+        "heroAssetId": "hero",
+        "relatedPageIds": [],
+        "ctas": [{ "label": "Try Cloud", "href": "https://cloud.revisium.io", "flagId": "pricing-banner" }]
+      }
+    },
+    {
+      "tableId": "Plan",
+      "rowId": "team",
+      "data": {
+        "name": "Team",
+        "monthlyPrice": 29,
+        "metadata": { "featuredFlagId": "pricing-banner" },
+        "features": [{ "name": "Versioned config", "weight": 10, "flagId": "pricing-banner" }]
+      }
+    }
+  ]
+}

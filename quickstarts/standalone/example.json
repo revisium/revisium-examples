@@ -1,0 +1,10 @@
+{
+  "id": "standalone",
+  "title": "Standalone Quickstart",
+  "path": "quickstarts/standalone",
+  "category": "quickstart",
+  "status": "bootstrap",
+  "modes": ["standalone"],
+  "useCases": ["local-development", "demo"],
+  "docs": "https://docs.revisium.io/quick-start"
+}

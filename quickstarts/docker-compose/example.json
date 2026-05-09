@@ -1,0 +1,10 @@
+{
+  "id": "docker-compose",
+  "title": "Docker Compose Quickstart",
+  "path": "quickstarts/docker-compose",
+  "category": "quickstart",
+  "status": "reference",
+  "modes": ["docker"],
+  "useCases": ["local-development", "demo"],
+  "docs": "https://docs.revisium.io/deployment"
+}

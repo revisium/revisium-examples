@@ -1,0 +1,192 @@
+{
+  "defaultUrl": "revisium://localhost:9222/admin/dictionary/master",
+  "organizationId": "admin",
+  "projectName": "dictionary",
+  "branchName": "master",
+  "commitMessage": "Bootstrap dictionary example",
+  "endpoints": ["REST_API", "GRAPHQL"],
+  "tables": [
+    {
+      "id": "Country",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "default": "" },
+          "isoCode": { "type": "string", "default": "" },
+          "aliases": { "type": "array", "items": { "type": "string", "default": "" } }
+        },
+        "required": ["name", "isoCode", "aliases"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "Currency",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "string", "default": "" },
+          "symbol": { "type": "string", "default": "" },
+          "minorUnit": { "type": "number", "default": 2 }
+        },
+        "required": ["code", "symbol", "minorUnit"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "GlossaryTerm",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "term": { "type": "string", "default": "" },
+          "definition": { "type": "string", "default": "", "contentMediaType": "text/markdown" },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "ownerCountryId": { "type": "string", "default": "", "foreignKey": "Country" }
+            },
+            "required": ["ownerCountryId"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["term", "definition", "metadata"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "FaqCategory",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "default": "" },
+          "slug": { "type": "string", "default": "" },
+          "weights": { "type": "array", "items": { "type": "number", "default": 0 } },
+          "icon": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" },
+          "weightTotal": {
+            "type": "number",
+            "readOnly": true,
+            "x-formula": { "version": 1, "expression": "sum(weights[*])" }
+          }
+        },
+        "required": ["name", "slug", "weights"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "FaqItem",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "question": { "type": "string", "default": "" },
+          "answer": { "type": "string", "default": "", "contentMediaType": "text/markdown" },
+          "order": { "type": "number", "default": 0 },
+          "categoryId": { "type": "string", "default": "", "foreignKey": "FaqCategory" },
+          "tags": { "type": "array", "items": { "type": "string", "default": "" } },
+          "relatedTermIds": {
+            "type": "array",
+            "items": { "type": "string", "default": "", "foreignKey": "GlossaryTerm" }
+          },
+          "localizedAnswers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "locale": { "type": "string", "default": "" },
+                "answer": { "type": "string", "default": "", "contentMediaType": "text/markdown" },
+                "score": { "type": "number", "default": 0 },
+                "currencyId": { "type": "string", "default": "", "foreignKey": "Currency" },
+                "position": {
+                  "type": "number",
+                  "readOnly": true,
+                  "x-formula": { "version": 1, "expression": "#index + 1" }
+                }
+              },
+              "required": ["locale", "answer", "score", "currencyId"],
+              "additionalProperties": false
+            }
+          },
+          "media": {
+            "type": "object",
+            "properties": {
+              "heroImage": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" },
+              "gallery": {
+                "type": "array",
+                "items": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" }
+              }
+            },
+            "additionalProperties": false
+          },
+          "summary": {
+            "type": "object",
+            "properties": {
+              "body": { "type": "string", "default": "" },
+              "wordCount": {
+                "type": "number",
+                "readOnly": true,
+                "x-formula": { "version": 1, "expression": "count(/localizedAnswers)" }
+              }
+            },
+            "additionalProperties": false
+          },
+          "attachments": {
+            "type": "array",
+            "items": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" }
+          },
+          "primaryTag": {
+            "type": "string",
+            "readOnly": true,
+            "x-formula": { "version": 1, "expression": "tags[0]" }
+          },
+          "answerScoreTotal": {
+            "type": "number",
+            "readOnly": true,
+            "x-formula": { "version": 1, "expression": "sum(localizedAnswers[*].score)" }
+          },
+          "localizedAnswerCount": {
+            "type": "number",
+            "readOnly": true,
+            "x-formula": { "version": 1, "expression": "count(localizedAnswers)" }
+          }
+        },
+        "required": ["question", "answer", "order", "categoryId", "tags", "relatedTermIds", "localizedAnswers"],
+        "additionalProperties": false
+      }
+    }
+  ],
+  "rows": [
+    {
+      "tableId": "Country",
+      "rowId": "us",
+      "data": { "name": "United States", "isoCode": "US", "aliases": ["USA", "United States of America"] }
+    },
+    {
+      "tableId": "Currency",
+      "rowId": "usd",
+      "data": { "code": "USD", "symbol": "$", "minorUnit": 2 }
+    },
+    {
+      "tableId": "GlossaryTerm",
+      "rowId": "refund",
+      "data": { "term": "Refund", "definition": "Money returned after a successful support review.", "metadata": { "ownerCountryId": "us" } }
+    },
+    {
+      "tableId": "FaqCategory",
+      "rowId": "billing",
+      "data": { "name": "Billing", "slug": "billing", "weights": [1, 2, 3] }
+    },
+    {
+      "tableId": "FaqItem",
+      "rowId": "refund-policy",
+      "data": {
+        "question": "How do refunds work?",
+        "answer": "Refunds are reviewed by the billing team.",
+        "order": 1,
+        "categoryId": "billing",
+        "tags": ["billing", "refund"],
+        "relatedTermIds": ["refund"],
+        "localizedAnswers": [
+          { "locale": "en-US", "answer": "Refunds are reviewed by the billing team.", "score": 10, "currencyId": "usd" }
+        ]
+      }
+    }
+  ]
+}
