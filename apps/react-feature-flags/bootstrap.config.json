@@ -1,0 +1,152 @@
+{
+  "defaultUrl": "revisium://localhost:9222/admin/frontend-config/master",
+  "organizationId": "admin",
+  "projectName": "frontend-config",
+  "branchName": "master",
+  "commitMessage": "Bootstrap React feature flags example",
+  "endpoints": ["REST_API", "GRAPHQL"],
+  "tables": [
+    {
+      "id": "AudienceSegment",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "default": "" },
+          "description": { "type": "string", "default": "" },
+          "countries": { "type": "array", "items": { "type": "string", "default": "" } }
+        },
+        "required": ["name", "description", "countries"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "Asset",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "default": "" },
+          "file": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" }
+        },
+        "required": ["title"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "FeatureFlag",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "enabled": { "type": "boolean", "default": false },
+          "rollout": { "type": "number", "default": 0 },
+          "description": { "type": "string", "default": "" },
+          "owner": { "type": "string", "default": "" },
+          "defaultSegmentId": { "type": "string", "default": "", "foreignKey": "AudienceSegment" },
+          "segmentIds": {
+            "type": "array",
+            "items": { "type": "string", "default": "", "foreignKey": "AudienceSegment" }
+          },
+          "environments": { "type": "array", "items": { "type": "string", "default": "" } },
+          "targeting": {
+            "type": "object",
+            "properties": {
+              "ownerSegmentId": { "type": "string", "default": "", "foreignKey": "AudienceSegment" },
+              "summary": {
+                "type": "string",
+                "readOnly": true,
+                "x-formula": { "version": 1, "expression": "ownerSegmentId + \":\" + /owner" }
+              }
+            },
+            "required": ["ownerSegmentId"],
+            "additionalProperties": false
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "segmentId": { "type": "string", "default": "", "foreignKey": "AudienceSegment" },
+                "weight": { "type": "number", "default": 0 },
+                "position": {
+                  "type": "number",
+                  "readOnly": true,
+                  "x-formula": { "version": 1, "expression": "#index + 1" }
+                }
+              },
+              "required": ["segmentId", "weight"],
+              "additionalProperties": false
+            }
+          },
+          "ui": {
+            "type": "object",
+            "properties": {
+              "bannerImage": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" },
+              "gallery": {
+                "type": "array",
+                "items": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" }
+              }
+            },
+            "additionalProperties": false
+          },
+          "assets": {
+            "type": "array",
+            "items": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" }
+          },
+          "isFullyRolledOut": {
+            "type": "boolean",
+            "readOnly": true,
+            "x-formula": { "version": 1, "expression": "enabled && rollout >= 100" }
+          },
+          "primaryEnvironment": {
+            "type": "string",
+            "readOnly": true,
+            "x-formula": { "version": 1, "expression": "environments[0]" }
+          },
+          "totalRuleWeight": {
+            "type": "number",
+            "readOnly": true,
+            "x-formula": { "version": 1, "expression": "sum(rules[*].weight)" }
+          }
+        },
+        "required": [
+          "enabled",
+          "rollout",
+          "description",
+          "owner",
+          "defaultSegmentId",
+          "segmentIds",
+          "environments",
+          "targeting",
+          "rules"
+        ],
+        "additionalProperties": false
+      }
+    }
+  ],
+  "rows": [
+    {
+      "tableId": "AudienceSegment",
+      "rowId": "public",
+      "data": { "name": "Public users", "description": "All public visitors", "countries": ["US", "TH"] }
+    },
+    {
+      "tableId": "Asset",
+      "rowId": "checkout-banner",
+      "data": { "title": "Checkout banner" }
+    },
+    {
+      "tableId": "FeatureFlag",
+      "rowId": "checkout-v2",
+      "data": {
+        "enabled": true,
+        "rollout": 25,
+        "description": "Enable checkout v2",
+        "owner": "growth",
+        "defaultSegmentId": "public",
+        "segmentIds": ["public"],
+        "environments": ["dev", "staging"],
+        "targeting": { "ownerSegmentId": "public" },
+        "rules": [{ "segmentId": "public", "weight": 25 }]
+      }
+    }
+  ]
+}

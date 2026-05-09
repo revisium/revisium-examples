@@ -1,0 +1,10 @@
+{
+  "id": "nextjs-remote-config",
+  "title": "Next.js Remote Config",
+  "path": "apps/nextjs-remote-config",
+  "category": "application",
+  "status": "bootstrap",
+  "modes": ["standalone", "docker", "cloud"],
+  "useCases": ["configuration-store", "headless-cms", "nextjs"],
+  "docs": "https://docs.revisium.io/use-cases/configuration-store"
+}

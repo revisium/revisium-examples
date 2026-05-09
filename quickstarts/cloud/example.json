@@ -1,0 +1,10 @@
+{
+  "id": "cloud",
+  "title": "Revisium Cloud Quickstart",
+  "path": "quickstarts/cloud",
+  "category": "quickstart",
+  "status": "bootstrap",
+  "modes": ["cloud"],
+  "useCases": ["managed-cloud", "mcp", "generated-api"],
+  "docs": "https://docs.revisium.io/quick-start"
+}

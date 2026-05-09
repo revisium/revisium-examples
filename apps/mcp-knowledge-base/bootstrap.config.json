@@ -1,0 +1,240 @@
+{
+  "defaultUrl": "revisium://localhost:9222/admin/knowledge-base/master",
+  "organizationId": "admin",
+  "projectName": "knowledge-base",
+  "branchName": "master",
+  "commitMessage": "Bootstrap MCP knowledge base example",
+  "endpoints": ["REST_API", "GRAPHQL"],
+  "tables": [
+    {
+      "id": "attachments",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "default": "" },
+          "file": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" }
+        },
+        "required": ["title"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "facts",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "topic": { "type": "string", "default": "" },
+          "source": { "type": "string", "default": "" },
+          "content": { "type": "string", "default": "", "contentMediaType": "text/markdown" },
+          "category": { "type": "string", "default": "" },
+          "verified": { "type": "boolean", "default": false },
+          "confidence": { "type": "number", "default": 0 },
+          "tags": { "type": "array", "items": { "type": "string", "default": "" } },
+          "evidence": {
+            "type": "object",
+            "properties": {
+              "primaryFile": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" }
+            },
+            "additionalProperties": false
+          },
+          "attachments": {
+            "type": "array",
+            "items": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" }
+          },
+          "qualityScore": {
+            "type": "number",
+            "readOnly": true,
+            "x-formula": { "version": 1, "expression": "confidence * 100" }
+          }
+        },
+        "required": ["topic", "source", "content", "category", "verified", "confidence", "tags"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "decisions",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "date": { "type": "string", "default": "" },
+          "title": { "type": "string", "default": "" },
+          "status": { "type": "string", "default": "" },
+          "context": { "type": "string", "default": "", "contentMediaType": "text/markdown" },
+          "decision": { "type": "string", "default": "", "contentMediaType": "text/markdown" },
+          "supportingFacts": {
+            "type": "array",
+            "items": { "type": "string", "default": "", "foreignKey": "facts" }
+          }
+        },
+        "required": ["date", "title", "status", "context", "decision", "supportingFacts"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "tasks",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "default": "" },
+          "status": { "type": "string", "default": "" },
+          "description": { "type": "string", "default": "", "contentMediaType": "text/markdown" },
+          "relatedFacts": {
+            "type": "array",
+            "items": { "type": "string", "default": "", "foreignKey": "facts" }
+          },
+          "relatedDecisions": {
+            "type": "array",
+            "items": { "type": "string", "default": "", "foreignKey": "decisions" }
+          }
+        },
+        "required": ["title", "status", "description", "relatedFacts", "relatedDecisions"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "modules",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "default": "" },
+          "path": { "type": "string", "default": "" },
+          "content": { "type": "string", "default": "", "contentMediaType": "text/markdown" }
+        },
+        "required": ["title", "path", "content"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "blockers",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "default": "" },
+          "status": { "type": "string", "default": "" },
+          "relatedTask": { "type": "string", "default": "", "foreignKey": "tasks" }
+        },
+        "required": ["title", "status", "relatedTask"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "sessions",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "date": { "type": "string", "default": "" },
+          "summary": { "type": "string", "default": "", "contentMediaType": "text/markdown" },
+          "context": {
+            "type": "object",
+            "properties": {
+              "primaryDecisionId": { "type": "string", "default": "", "foreignKey": "decisions" }
+            },
+            "required": ["primaryDecisionId"],
+            "additionalProperties": false
+          },
+          "tasksCompleted": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "taskId": { "type": "string", "default": "", "foreignKey": "tasks" }
+              },
+              "required": ["taskId"],
+              "additionalProperties": false
+            }
+          },
+          "metrics": {
+            "type": "object",
+            "properties": {
+              "doneCount": {
+                "type": "number",
+                "readOnly": true,
+                "x-formula": { "version": 1, "expression": "count(tasksCompleted)" }
+              }
+            },
+            "additionalProperties": false
+          },
+          "evidence": {
+            "type": "object",
+            "properties": {
+              "files": {
+                "type": "array",
+                "items": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" }
+              }
+            },
+            "additionalProperties": false
+          },
+          "firstCompletedTaskId": {
+            "type": "string",
+            "readOnly": true,
+            "x-formula": { "version": 1, "expression": "tasksCompleted[0].taskId" }
+          },
+          "totalLinkedItems": {
+            "type": "number",
+            "readOnly": true,
+            "x-formula": { "version": 1, "expression": "count(tasksCompleted)" }
+          }
+        },
+        "required": ["date", "summary", "context", "tasksCompleted"],
+        "additionalProperties": false
+      }
+    }
+  ],
+  "rows": [
+    {
+      "tableId": "facts",
+      "rowId": "mcp-access",
+      "data": {
+        "topic": "MCP access",
+        "source": "example",
+        "content": "Agents can search and read structured Revisium rows through MCP.",
+        "category": "mcp",
+        "verified": true,
+        "confidence": 0.9,
+        "tags": ["mcp", "agent"]
+      }
+    },
+    {
+      "tableId": "decisions",
+      "rowId": "use-revisium-kb",
+      "data": {
+        "date": "2026-05-09",
+        "title": "Use Revisium for structured KB",
+        "status": "accepted",
+        "context": "Agents need typed knowledge with review.",
+        "decision": "Store facts and decisions in Revisium tables.",
+        "supportingFacts": ["mcp-access"]
+      }
+    },
+    {
+      "tableId": "tasks",
+      "rowId": "bootstrap-kb",
+      "data": {
+        "title": "Bootstrap KB",
+        "status": "done",
+        "description": "Create tables and seed initial rows.",
+        "relatedFacts": ["mcp-access"],
+        "relatedDecisions": ["use-revisium-kb"]
+      }
+    },
+    {
+      "tableId": "modules",
+      "rowId": "mcp-tools",
+      "data": {
+        "title": "MCP tools",
+        "path": "docs/apis/mcp",
+        "content": "Use get_tables, get_rows, get_row, and search_rows for read workflows."
+      }
+    },
+    {
+      "tableId": "sessions",
+      "rowId": "initial-bootstrap",
+      "data": {
+        "date": "2026-05-09",
+        "summary": "Initial KB bootstrap completed.",
+        "context": { "primaryDecisionId": "use-revisium-kb" },
+        "tasksCompleted": [{ "taskId": "bootstrap-kb" }]
+      }
+    }
+  ]
+}

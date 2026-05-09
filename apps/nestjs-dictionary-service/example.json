@@ -1,0 +1,10 @@
+{
+  "id": "nestjs-dictionary-service",
+  "title": "NestJS Dictionary Service",
+  "path": "apps/nestjs-dictionary-service",
+  "category": "application",
+  "status": "bootstrap",
+  "modes": ["standalone", "docker", "cloud"],
+  "useCases": ["dictionary-service", "generated-api", "backend"],
+  "docs": "https://docs.revisium.io/guides/dictionary-service-nestjs"
+}
