@@ -11,6 +11,7 @@ Use this repository when you want to see Revisium in a real application shape:
 - as a standalone, Docker, Kubernetes, or managed Cloud service
 
 The examples are intentionally small. Full framework applications should live in separate project repositories; this repo keeps the bootstrap config, environment contract, and minimal code context needed to understand each integration.
+For the built-out examples that live in this repo, the catalog files stay at `apps/<name>/` and the runnable app lives in `apps/<name>/project/`.
 
 ## Start Here
 
@@ -83,9 +84,13 @@ npm run validate
 ```text
 apps/
   mcp-knowledge-base/
+    project/
   nestjs-dictionary-service/
+    project/
   nextjs-remote-config/
+    project/
   react-feature-flags/
+    project/
 
 quickstarts/
   cloud/
@@ -112,6 +117,7 @@ Each example must include:
 - `README.md` following [`templates/example/README.md`](./templates/example/README.md)
 - `example.json` metadata for the website/docs catalog
 - application examples: `.env.example`, `bootstrap.config.json`, and `scripts/bootstrap.mjs`
+- runnable app examples: `project/README.md`, `project/package.json`, and source files under `project/src/`
 - application `.env.example` files should use one `REVISIUM_URL` in `revisium://host/org/project/branch` format
 - framework app code should stay minimal here; full runnable apps belong in separate project repositories
 - no real secrets or customer data
