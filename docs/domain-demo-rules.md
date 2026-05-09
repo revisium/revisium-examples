@@ -30,6 +30,10 @@ Use safe documented hosts:
 | `reference` | Example documents an integration or deployment shape but does not create app data |
 | `researched` | Example is based on a live or existing Revisium project shape and may mirror its naming |
 
+## Implementation Depth
+
+Keep application examples in this repository small. They should show the Revisium schema, seed data, environment contract, and a compact developer code context. Full runnable framework applications should be created as separate project repositories and linked from the relevant README when they exist.
+
 ## Required Capability Coverage
 
 Each application example README must include `## Capability Coverage` with this matrix.
