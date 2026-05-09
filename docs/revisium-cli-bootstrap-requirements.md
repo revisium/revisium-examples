@@ -1,6 +1,7 @@
 # Revisium CLI Bootstrap Requirements
 
-The examples should eventually bootstrap through `revisium-cli` alone. Today the CLI covers migrations, schemas, rows, and sync, while full example bootstrap also needs project and endpoint lifecycle operations.
+The examples should bootstrap through `revisium-cli` and a small shared script. Today
+the examples are optimized for local writable Revisium and then optional Cloud verification.
 
 Examples use the same target format as `revisium-cli`:
 
@@ -41,3 +42,10 @@ Each app has:
 - `bootstrap.config.json` for tables, seed rows, and endpoint types
 - `scripts/bootstrap.mjs` wrapper
 - shared root implementation in `scripts/bootstrap-example.mjs`
+
+Recommended local bootstrap flow for all apps:
+
+- Set `.env` with `REVISIUM_URL` (prefer `localhost` while composing).
+- Start Revisium locally with `npx @revisium/standalone@latest` (or Docker Compose equivalent).
+- Run `npm run bootstrap:<example-script>`.
+- Use `@revisium/client` read/write APIs via the same URL format.

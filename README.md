@@ -49,6 +49,26 @@ Every application example should explain how to run against each supported Revis
 | Bootstrap React demo data | `npm run bootstrap:react` | Creates feature flag tables, rows, and generated endpoints |
 | Bootstrap MCP KB demo data | `npm run bootstrap:mcp-kb` | Creates knowledge-base tables, rows, and generated endpoints |
 
+## Run multiple demos
+
+The four application examples can share one local standalone process:
+
+- Start one `npx @revisium/standalone@latest` session.
+- Point every example `REVISIUM_URL` at the same `localhost:9222` host.
+- Use different projects (`dictionary`, `web-config`, `frontend-config`, `knowledge-base`) to keep data isolated.
+
+Check if standalone is already running:
+
+```bash
+curl -fsS http://localhost:9222 >/dev/null && echo "standalone is up" || echo "start standalone first"
+# Unix/Linux/macOS:
+lsof -iTCP:9222 -sTCP:LISTEN
+# Windows PowerShell:
+# Get-NetTCPConnection -LocalPort 9222 -State Listen
+```
+
+If `npx @revisium/standalone@latest` returns `EADDRINUSE`, another process already owns `:9222`; reuse it rather than starting another one.
+
 ## Architecture
 
 ```mermaid

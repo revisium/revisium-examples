@@ -1,8 +1,10 @@
 # MCP Knowledge Base
 
-Use Revisium Cloud as a structured knowledge base that AI agents can inspect through MCP.
+Use a local writable Revisium instance for primary knowledge-base authoring, with
+Cloud as an optional read/inspect MCP endpoint.
 
-The runnable MCP server lives in [`project/`](./project/README.md); bootstrap config and seed data stay at this example root, while `project/` contains the runnable app.
+The runnable MCP server lives in [`project/`](./project/README.md). Bootstrap config
+and seed data stay at this example root, while `project/` contains the runnable app.
 
 ## What This Shows
 
@@ -15,21 +17,53 @@ The runnable MCP server lives in [`project/`](./project/README.md); bootstrap co
 
 | Mode | URL | Notes |
 | --- | --- | --- |
-| Revisium Cloud | `https://cloud.revisium.io/mcp` | Primary researched mode |
-| Standalone | `http://localhost:9222/mcp` | Local copy of the same schema |
+| Revisium Cloud | `https://cloud.revisium.io/mcp` | Optional managed read access |
+| Standalone | `http://localhost:9222/mcp` | Local copy for writable tests |
 | Docker Compose | `http://localhost:8080/mcp` | Self-hosted copy of the same schema |
 
 ## Run
 
 | Step | Command or action | Notes |
 | --- | --- | --- |
-| 1 | `cp apps/mcp-knowledge-base/.env.example apps/mcp-knowledge-base/.env` | Fill one `REVISIUM_URL` |
-| 2 | `npm install` | Install repo validation and bootstrap tooling |
-| 3 | `npm run bootstrap:mcp-kb` | Create local KB tables, seed rows, and REST/GraphQL endpoints |
-| 4 | `claude mcp add --transport http revisium-cloud https://cloud.revisium.io/mcp` | Adds Cloud MCP server |
-| 5 | `get_projects(organizationId: "revisium-kb")` | Confirms KB project visibility |
-| 6 | `get_tables(uri: "revisium-kb/memory/master:head", includeSchema: true, includeRowCount: true)` | Reads table structure |
-| 7 | `search_rows(uri: "revisium-kb/memory/master:head", query: "landing page")` | Searches the KB |
+| 1 | `npm install` | Install repo validation and bootstrap tooling |
+| 2 | `cp apps/mcp-knowledge-base/.env.example apps/mcp-knowledge-base/.env` | Fill one `REVISIUM_URL` |
+| 3 | `npx @revisium/standalone@latest` | Start writable local Revisium (`:9222`) |
+| 4 | `npm run bootstrap:mcp-kb` | Create KB tables, seed rows, and endpoints |
+| 5 | `cd apps/mcp-knowledge-base/project && cp .env.example .env && npm install` | Prepare MCP server env and dependencies |
+| 6 | `npm run build` | Build MCP server |
+| 7 | `npm start` | Run MCP server |
+| 8 | Register this stdio MCP server | Use the command below from `apps/mcp-knowledge-base/project` |
+
+```bash
+claude mcp add revisium-kb --env REVISIUM_URL="$(grep '^REVISIUM_URL=' .env | cut -d= -f2-)" -- node "$(pwd)/dist/main.js"
+```
+
+## See and Manage Data
+
+- Admin UI: `http://localhost:9222`
+- MCP local endpoint: `http://localhost:9222/mcp`
+- MCP Cloud endpoint: `https://cloud.revisium.io/mcp` (optional read-only inspection)
+- REST visibility check:
+  `http://localhost:9222/endpoint/rest/admin/knowledge-base/master/head/facts`
+
+Use local instances for all content edits; promote to Cloud only after review and
+snapshot export.
+
+```bash
+npm install
+cp apps/mcp-knowledge-base/.env.example apps/mcp-knowledge-base/.env
+
+# terminal 1
+npx @revisium/standalone@latest
+
+# terminal 2
+npm run bootstrap:mcp-kb
+cd apps/mcp-knowledge-base/project
+cp .env.example .env
+npm install
+npm run build
+npm start
+```
 
 ## Architecture
 

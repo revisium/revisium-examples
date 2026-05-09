@@ -30,9 +30,12 @@ Suggested page structure:
    - Quickstarts
    - Applications
    - Infrastructure
-3. Link directly to the runnable `project/` folders inside GitHub example folders.
+3. Link directly to each example root README (`apps/<example>/`) so users see run instructions, architecture, and data-management model.
 4. Explain mode support: Standalone, Docker Compose, Revisium Cloud, Kubernetes.
 5. Link back to relevant docs pages beside each example.
+
+Example readmes should direct writes to local standalone or Docker Compose and treat
+Cloud primarily as a verification/consume target.
 
 Suggested sidebar placement:
 
@@ -64,10 +67,10 @@ Use Revisium examples when you want a copyable project shape instead of only API
 | [Standalone Quickstart](https://github.com/revisium/revisium-examples/tree/master/quickstarts/standalone) | Local development | Standalone |
 | [Docker Compose](https://github.com/revisium/revisium-examples/tree/master/quickstarts/docker-compose) | Self-hosted local service | Docker |
 | [Revisium Cloud](https://github.com/revisium/revisium-examples/tree/master/quickstarts/cloud) | Managed project, MCP, generated APIs | Cloud |
-| [NestJS Dictionary Service](https://github.com/revisium/revisium-examples/tree/master/apps/nestjs-dictionary-service/project) | Reference data backend | Standalone, Docker, Cloud |
-| [Next.js Remote Config](https://github.com/revisium/revisium-examples/tree/master/apps/nextjs-remote-config/project) | Runtime web config | Standalone, Docker, Cloud |
-| [React Feature Flags](https://github.com/revisium/revisium-examples/tree/master/apps/react-feature-flags/project) | Client-visible flags | Standalone, Docker, Cloud |
-| [MCP Knowledge Base](https://github.com/revisium/revisium-examples/tree/master/apps/mcp-knowledge-base/project) | Agent memory and KB access | Cloud, Standalone, Docker |
+| [NestJS Dictionary Service](https://github.com/revisium/revisium-examples/tree/master/apps/nestjs-dictionary-service) | Reference data backend | Standalone, Docker, Cloud |
+| [Next.js Remote Config](https://github.com/revisium/revisium-examples/tree/master/apps/nextjs-remote-config) | Runtime web config | Standalone, Docker, Cloud |
+| [React Feature Flags](https://github.com/revisium/revisium-examples/tree/master/apps/react-feature-flags) | Client-visible flags | Standalone, Docker, Cloud |
+| [MCP Knowledge Base](https://github.com/revisium/revisium-examples/tree/master/apps/mcp-knowledge-base) | Agent memory and KB access | Cloud, Standalone, Docker |
 ```
 
 ## revisium.io

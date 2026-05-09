@@ -2,7 +2,8 @@
 
 Read client-facing feature flags from Revisium without redeploying a React app.
 
-The runnable app lives in [`project/`](./project/README.md); bootstrap config and seed data stay at this example root, while `project/` contains the runnable app.
+The runnable app lives in [`project/`](./project/README.md). Use local writable Revisium
+for bootstrap and flag authoring, then point production-facing apps at Cloud if needed.
 
 ## What This Shows
 
@@ -15,8 +16,8 @@ The runnable app lives in [`project/`](./project/README.md); bootstrap config an
 
 | Mode | URL | Notes |
 | --- | --- | --- |
-| Standalone | `http://localhost:9222` | Local development |
-| Docker Compose | `http://localhost:8080` | Local service parity |
+| Standalone | `http://localhost:9222` | Local development (mutable) |
+| Docker Compose | `http://localhost:8080` | Local service parity (standalone + PostgreSQL) |
 | Revisium Cloud | `https://cloud.revisium.io` | Managed flag source |
 
 ## Architecture
@@ -110,29 +111,40 @@ src/
 
 The `FlagsProvider` should load flags once on app start, then refresh on a short interval only if the product needs near-real-time behavior.
 
+## See and Manage Data
+
+- Admin UI: `http://localhost:9222`
+- Public feature endpoint:
+  `http://localhost:9222/endpoint/rest/admin/frontend-config/master/head/FeatureFlag`
+- MCP (optional): `http://localhost:9222/mcp`
+
+Use local revisium instances for schema and content edits. Use Cloud only for demo readers.
+
 ## Run
 
 | Step | Command | Notes |
 | --- | --- | --- |
-| 1 | `cp apps/react-feature-flags/.env.example apps/react-feature-flags/.env` | Fill one `REVISIUM_URL` |
-| 2 | `npm install` | Install repo validation and bootstrap tooling |
-| 3 | `npm run bootstrap:react` | Create Revisium tables, seed rows, and REST/GraphQL endpoints |
-| 4 | `npm run dev` | Starts the React app |
-| 5 | Toggle a flag in Revisium | Commit before reading from `head` |
+| 1 | `npm install` | Install repo validation and bootstrap tooling |
+| 2 | `cp apps/react-feature-flags/.env.example apps/react-feature-flags/.env` | Fill one `REVISIUM_URL` |
+| 3 | `npx @revisium/standalone@latest` | Start writable local Revisium (`:9222`) |
+| 4 | `npm run bootstrap:react` | Create revisium tables and seed rows |
+| 5 | `cd apps/react-feature-flags/project && npm install` | Install app dependencies |
+| 6 | `npm run dev` | Starts the React app |
+| 7 | `curl -fsS http://localhost:3000` | Smoke test app UI loads |
+| 8 | `curl -fsS http://localhost:9222/endpoint/rest/admin/frontend-config/master/head/FeatureFlag` | Confirm row payload for local checks |
 
 ```bash
 cp apps/react-feature-flags/.env.example apps/react-feature-flags/.env
 npm install
+# terminal 1
+npx @revisium/standalone@latest
+
+# terminal 2
 npm run bootstrap:react
+cd apps/react-feature-flags/project
+npm install
 npm run dev
 ```
-
-The first real implementation should add:
-
-- Vite React project
-- `FlagsProvider`
-- `useFlag("flag-id")`
-- small demo UI that reacts to a flag row
 
 ## Verify
 

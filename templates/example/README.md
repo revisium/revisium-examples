@@ -24,23 +24,74 @@ Remove unsupported rows for the concrete example.
 - Revisium instance, depending on the selected mode
 - API key or user credentials when the example requires authenticated calls
 
+### Data management model
+
+Prefer local writable services for all schema and row mutations:
+
+- Standalone (`http://localhost:9222`) via `npx @revisium/standalone@latest`
+- Docker Compose (`http://localhost:8080`) for local parity with PostgreSQL
+
+Cloud endpoints are useful for verification and demos, but this example assumes
+content is managed through local revisium (standalone/docker) so data changes are
+explicit, reversible, and reproducible.
+
 ## Run
 
 | Step | Command | Notes |
 | --- | --- | --- |
-| 1 | `cp .env.example .env` | Fill one `REVISIUM_URL` in `revisium://` format |
-| 2 | `npm install` | Only when this example contains an app package |
-| 3 | `npm run dev` | Starts the example application |
+| 1 | `npm install` | Install repo-level tooling and scripts |
+| 2 | `npx @revisium/standalone@latest` | Start writable local Revisium on `:9222` |
+| 3 | `cp .env.example .env` | Fill one `REVISIUM_URL` for local mode |
+| 4 | `npm run bootstrap:<example-script>` | Create tables, seed rows, and endpoints |
+| 5 | `cd project && npm install` | Install app dependencies |
+| 6 | `npm run dev` | Start the example app (swap script for this framework) |
 
 ```bash
 # copy example env
 cp .env.example .env
 
-# install dependencies when this example has an app package
+# install repo tooling and helper scripts
 npm install
 
-# start the example
+# start writable revisium service
+npx @revisium/standalone@latest
+
+# bootstrap tables, seed rows, and endpoints from this repo
+npm run bootstrap:<example-script>
+
+# open project/ and start the app
+cd project
+npm install
 npm run dev
+```
+
+### See and manage data
+
+Use the same writable local service used above:
+
+- Admin UI: `http://localhost:9222`
+- MCP (if using client): `http://localhost:9222/mcp`
+- Generated endpoints: `http://localhost:9222/endpoint/rest/<org>/<project>/<branch>:head/<Table>`
+
+Prefer this flow for writes and content changes. Move to Cloud only after data
+is staged and the example is validated.
+
+### Multi-demo workflow
+
+You can run several examples against the same local Revisium process:
+
+- Keep one `npx @revisium/standalone@latest` session on `:9222`.
+- Use different projects in each example config (`dictionary`, `web-config`, etc.).
+- Keep `REVISIUM_URL` pointed at the same host/port and switch only organization/project/branch when needed.
+
+Check for a running process before starting another:
+
+```bash
+curl -fsS http://localhost:9222 >/dev/null && echo "standalone is up" || echo "start standalone first"
+# Unix/Linux/macOS:
+lsof -iTCP:9222 -sTCP:LISTEN
+# Windows PowerShell:
+# Get-NetTCPConnection -LocalPort 9222 -State Listen
 ```
 
 ## Architecture
@@ -92,7 +143,7 @@ Follow [`docs/domain-demo-rules.md`](../../docs/domain-demo-rules.md) for applic
 ## Verify
 
 ```bash
-# replace with the smallest useful smoke test
+# replace with the smallest useful smoke test for the example app
 curl http://localhost:3000/health
 ```
 

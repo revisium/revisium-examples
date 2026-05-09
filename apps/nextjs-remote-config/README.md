@@ -2,7 +2,8 @@
 
 Load runtime content, feature switches, and pricing settings from Revisium in a Next.js app.
 
-The runnable app lives in [`project/`](./project/README.md); bootstrap config and seed data stay at this example root, while `project/` contains the runnable app.
+The runnable app lives in [`project/`](./project/README.md). Keep mutable data operations
+in local Revisium (standalone or docker compose) and use Cloud only as a consume/verify surface.
 
 ## What This Shows
 
@@ -15,7 +16,7 @@ The runnable app lives in [`project/`](./project/README.md); bootstrap config an
 
 | Mode | URL | Notes |
 | --- | --- | --- |
-| Standalone | `http://localhost:9222` | Local development |
+| Standalone | `http://localhost:9222` | Local development (mutable) |
 | Docker Compose | `http://localhost:8080` | Local integration with PostgreSQL |
 | Revisium Cloud | `https://cloud.revisium.io` | Managed preview and production |
 
@@ -91,8 +92,6 @@ revisium://[user:password@]host[:port]/organization/project/branch[:revision][?t
 
 ```env
 REVISIUM_URL=revisium://your-username:your-password@localhost:9222/admin/web-config/master
-NEXT_PUBLIC_REVISIUM_REST_ENDPOINT=http://localhost:9222/endpoint/rest/admin/web-config/master/head
-REVISIUM_GRAPHQL_ENDPOINT=http://localhost:9222/endpoint/graphql/admin/web-config/master/head
 ```
 
 Use generated `draft` endpoints for preview reads and generated `head` endpoints for production reads.
@@ -101,8 +100,6 @@ Cloud mode keeps the same shape and carries the API key in the URL:
 
 ```env
 REVISIUM_URL=revisium://cloud.revisium.io/my-org/web-config/master?apikey=rev_xxx
-NEXT_PUBLIC_REVISIUM_REST_ENDPOINT=https://cloud.revisium.io/endpoint/rest/my-org/web-config/master/head
-REVISIUM_GRAPHQL_ENDPOINT=https://cloud.revisium.io/endpoint/graphql/my-org/web-config/master/head
 ```
 
 ## Next.js Shape
@@ -126,30 +123,40 @@ The app should fetch server-side and cache according to the business need:
 - public content: static generation with webhook/manual revalidation
 - preview routes: draft revision only
 
+## See and Manage Data
+
+- Admin UI: `http://localhost:9222`
+- Generated REST endpoint: `http://localhost:9222/endpoint/rest/admin/web-config/master/head`
+- Generated GraphQL endpoint: `http://localhost:9222/endpoint/graphql/admin/web-config/master/head`
+- MCP endpoint (if enabled): `http://localhost:9222/mcp`
+
+Mutations should be done in standalone/docker-compose. Use Cloud for read/preview after bootstrap.
+
 ## Run
 
 | Step | Command | Notes |
 | --- | --- | --- |
-| 1 | `cp apps/nextjs-remote-config/.env.example apps/nextjs-remote-config/.env` | Fill one `REVISIUM_URL` |
-| 2 | `npm install` | Install repo validation and bootstrap tooling |
-| 3 | `npm run bootstrap:nextjs` | Create Revisium tables, seed rows, and REST/GraphQL endpoints |
-| 4 | `npm run dev` | Starts Next.js on port `3000` |
-| 5 | Open `http://localhost:3000` | Reads config from Revisium |
+| 1 | `npm install` | Install repo validation and bootstrap tooling |
+| 2 | `cp apps/nextjs-remote-config/.env.example apps/nextjs-remote-config/.env` | Fill one `REVISIUM_URL` |
+| 3 | `npx @revisium/standalone@latest` | Start writable local Revisium (`:9222`) |
+| 4 | `npm run bootstrap:nextjs` | Create Revisium tables, seed rows, and endpoints |
+| 5 | `cd apps/nextjs-remote-config/project && npm install` | Install app dependencies |
+| 6 | `npm run dev` | Starts Next.js on port `3000` |
+| 7 | `curl -fsS http://localhost:3000/api/config` | Verify generated config response |
+| 8 | `curl -fsS http://localhost:9222/endpoint/rest/admin/web-config/master/head/FeatureFlag` | Verify local seeded rows |
 
 ```bash
 cp apps/nextjs-remote-config/.env.example apps/nextjs-remote-config/.env
 npm install
+# terminal 1
+npx @revisium/standalone@latest
+
+# terminal 2
 npm run bootstrap:nextjs
+cd apps/nextjs-remote-config/project
+npm install
 npm run dev
 ```
-
-The first real implementation should add:
-
-- `package.json`
-- Next.js App Router project
-- Revisium API client
-- preview route using `draft`
-- production route using `head`
 
 ## Verify
 

@@ -30,15 +30,9 @@ REVISIUM_URL=revisium://cloud.revisium.io/my-org/knowledge-base/master:head?apik
 
 ## Run
 
-First bootstrap the Revisium project from the catalog repository:
+Bootstrap is done from the example root (`npm run bootstrap:mcp-kb`).
 
-```bash
-cd ../../../
-npm install
-npm run bootstrap:mcp-kb
-```
-
-Then build this MCP server from the repo root:
+Build this MCP server from the project root:
 
 ```bash
 cd apps/mcp-knowledge-base/project

@@ -18,15 +18,9 @@ This browser-only example uses a public generated endpoint instead of `@revisium
 
 ## Run
 
-First bootstrap the Revisium project from the catalog repository:
+Bootstrap is done from the example root (`npm run bootstrap:react`).
 
-```bash
-cd ../../../
-npm install
-npm run bootstrap:react
-```
-
-Then run this app from the repo root:
+Run this app from the repository root:
 
 ```bash
 cd apps/react-feature-flags/project

@@ -31,15 +31,9 @@ REVISIUM_URL=revisium://cloud.revisium.io/my-org/dictionary/master:head?apikey=r
 
 ## Run
 
-First bootstrap the Revisium project from the catalog repository:
+Bootstrap is done from the example root (`npm run bootstrap:nestjs`).
 
-```bash
-cd ../../../
-npm install
-npm run bootstrap:nestjs
-```
-
-Then run this app from the repo root:
+Run this runtime app with local env, installed dependencies, and a build step:
 
 ```bash
 cd apps/nestjs-dictionary-service/project
