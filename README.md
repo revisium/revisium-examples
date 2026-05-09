@@ -1,6 +1,6 @@
 # Revisium Examples
 
-Ready-to-run and reference examples for building with Revisium.
+Quickstarts, bootstrap configs, and compact developer contexts for building with Revisium.
 
 Use this repository when you want to see Revisium in a real application shape:
 
@@ -10,7 +10,7 @@ Use this repository when you want to see Revisium in a real application shape:
 - as an MCP-accessible knowledge base for AI agents
 - as a standalone, Docker, Kubernetes, or managed Cloud service
 
-The examples are intentionally small. Each example owns one integration pattern and links to the docs page that explains the underlying concept.
+The examples are intentionally small. Full framework applications should live in separate project repositories; this repo keeps the bootstrap config, environment contract, and minimal code context needed to understand each integration.
 
 ## Start Here
 
@@ -40,7 +40,7 @@ Every application example should explain how to run against each supported Revis
 | Task | Command | Notes |
 | --- | --- | --- |
 | Install validation tools | `npm install` | Generates the lockfile and installs ESLint/test tooling |
-| Validate catalog, tests, and lint | `npm run validate` | Checks metadata, README sections, node:test schema tests, ESLint, and Sonar ESLint report |
+| Validate catalog, tests, and lint | `npm run validate` | Checks metadata, README sections, node:test tests, ESLint, and Sonar ESLint report |
 | Run standalone quickstart | `npx @revisium/standalone@latest` | See `quickstarts/standalone` |
 | Run Docker quickstart | `cd quickstarts/docker-compose && docker compose up -d` | Requires `.env` copied from `.env.example` |
 | Bootstrap NestJS demo data | `npm run bootstrap:nestjs` | Creates dictionary tables, rows, and generated endpoints |
@@ -113,6 +113,7 @@ Each example must include:
 - `example.json` metadata for the website/docs catalog
 - application examples: `.env.example`, `bootstrap.config.json`, and `scripts/bootstrap.mjs`
 - application `.env.example` files should use one `REVISIUM_URL` in `revisium://host/org/project/branch` format
+- framework app code should stay minimal here; full runnable apps belong in separate project repositories
 - no real secrets or customer data
 - a clear list of supported modes: standalone, docker, cloud, or kubernetes
 - a verification command or manual smoke test

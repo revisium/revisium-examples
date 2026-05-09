@@ -87,7 +87,7 @@ An example is public-marketing-ready only when it has:
 - docs links
 - CI check or smoke test
 
-README-only examples are useful for planning, but they should be labeled `bootstrap` until runnable.
+Compact examples are useful for planning and onboarding. Keep this repository focused on bootstrap configs and developer context; publish full runnable framework apps as separate project repositories when a workflow needs more code.
 
 ## Reference Patterns
 

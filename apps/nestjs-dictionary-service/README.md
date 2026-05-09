@@ -6,7 +6,7 @@ Use Revisium as a typed reference-data service behind a NestJS backend.
 
 - dictionary/reference data stored outside the transactional application database
 - schemas and seed data managed in Revisium
-- generated REST or GraphQL client consumed from NestJS
+- `@revisium/client` consumed from a NestJS service
 - the same NestJS code pointed at standalone, Docker, or Revisium Cloud
 
 ## Supported Modes
@@ -20,18 +20,18 @@ Use Revisium as a typed reference-data service behind a NestJS backend.
 ## Prerequisites
 
 - Node.js 22+
-- NestJS project or `nest new`
+- NestJS application in a separate full example project
 - Revisium instance in one supported mode
-- Generated endpoint enabled for the project branch
+- API key, token, or username/password for the target Revisium project
 
 ## Architecture
 
 ```mermaid
 flowchart LR
   Client[Frontend or API consumer] --> Nest[NestJS backend]
-  Nest --> DictionaryClient[Generated Revisium client]
-  DictionaryClient --> Endpoint[Generated REST or GraphQL endpoint]
-  Endpoint --> Revisium[Revisium]
+  Nest --> DictionaryService[Dictionary service]
+  DictionaryService --> ClientSdk[@revisium/client]
+  ClientSdk --> Revisium[Revisium API]
   Revisium --> Tables[(Dictionary tables)]
   Editor[Content manager] --> Admin[Admin UI]
   Admin --> Revisium
@@ -120,21 +120,33 @@ REVISIUM_REST_ENDPOINT=https://cloud.revisium.io/endpoint/rest/my-org/dictionary
 REVISIUM_GRAPHQL_ENDPOINT=https://cloud.revisium.io/endpoint/graphql/my-org/dictionary/master/head
 ```
 
-## NestJS Shape
+## Developer Context
 
-Recommended module boundary:
+Full framework applications should live in separate project repositories. This example keeps the compact context a developer needs to wire Revisium into a NestJS service.
 
-```text
-src/features/dictionary/
-  generated/              # generated OpenAPI or GraphQL client
-  dictionary.module.ts
-  dictionary-client.ts    # wraps generated client with auth/base URL
-  queries/
-    get-faq-items.query.ts
-    get-faq-items.handler.ts
+Use `@revisium/client` inside the service layer:
+
+```ts
+import { RevisiumClient } from "@revisium/client";
+
+const client = new RevisiumClient({ baseUrl: "http://localhost:9222" });
+client.loginWithApiKey("rev_xxx");
+
+const revision = await client.revision({
+  org: "admin",
+  project: "dictionary",
+  branch: "master",
+  revision: "head",
+});
+
+const rows = await revision.getRows("FaqItem", { first: 100 });
+const faqItems = rows.edges.map(({ node }) => ({
+  id: node.id,
+  ...node.data,
+}));
 ```
 
-The backend should not know whether Revisium is standalone, Docker, or Cloud. Keep that in environment variables.
+In a real NestJS app, put this behind a small `DictionaryService` and keep URL parsing/auth selection in application config. The same service can point at standalone, Docker, or Cloud by changing `REVISIUM_URL`.
 
 ## Run
 
@@ -143,33 +155,21 @@ The backend should not know whether Revisium is standalone, Docker, or Cloud. Ke
 | 1 | `cp apps/nestjs-dictionary-service/.env.example apps/nestjs-dictionary-service/.env` | Fill one `REVISIUM_URL` |
 | 2 | `npm install` | Install repo validation and bootstrap tooling |
 | 3 | `npm run bootstrap:nestjs` | Create Revisium tables, seed rows, and REST/GraphQL endpoints |
-| 4 | `(inside your NestJS app) npm run generate:dictionary-api` | Generate client from Revisium endpoint |
-| 5 | `(inside your NestJS app) npm run start:dev` | Start the NestJS app |
+| 4 | Copy the service snippet into your NestJS app | Keep the full app in its own project repository |
 
 ```bash
 cp apps/nestjs-dictionary-service/.env.example apps/nestjs-dictionary-service/.env
 npm install
 npm run bootstrap:nestjs
-
-# inside your NestJS application repo
-npm run generate:dictionary-api
-npm run start:dev
 ```
-
-The first real implementation should add:
-
-- `package.json`
-- generated client script
-- one controller/query handler
-- one smoke test that calls a seeded `FaqItem`
 
 ## Verify
 
 ```bash
-curl -fsS http://localhost:3000/faq
+curl -fsS http://localhost:9222/endpoint/rest/admin/dictionary/master/head/FaqItem
 ```
 
-Expected result: list of FAQ rows read from Revisium, not from the NestJS database.
+Expected result: list of FAQ rows read from Revisium. The separate NestJS project should expose its own app-level route around the same `@revisium/client` call.
 
 ## Docs
 
