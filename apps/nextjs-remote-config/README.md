@@ -2,6 +2,8 @@
 
 Load runtime content, feature switches, and pricing settings from Revisium in a Next.js app.
 
+The runnable app lives in [`project/`](./project/README.md); bootstrap config and seed data stay at this example root, while `project/` contains the runnable app.
+
 ## What This Shows
 
 - Revisium as a configuration store for web apps
