@@ -20,7 +20,7 @@ This browser-only example uses a public generated endpoint instead of `@revisium
 
 Bootstrap is done from the example root (`npm run bootstrap:react`).
 
-Run this app from the project root:
+Run this app from the repository root:
 
 ```bash
 cd apps/react-feature-flags/project

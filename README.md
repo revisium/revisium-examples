@@ -61,7 +61,10 @@ Check if standalone is already running:
 
 ```bash
 curl -fsS http://localhost:9222 >/dev/null && echo "standalone is up" || echo "start standalone first"
+# Unix/Linux/macOS:
 lsof -iTCP:9222 -sTCP:LISTEN
+# Windows PowerShell:
+# Get-NetTCPConnection -LocalPort 9222 -State Listen
 ```
 
 If `npx @revisium/standalone@latest` returns `EADDRINUSE`, another process already owns `:9222`; reuse it rather than starting another one.

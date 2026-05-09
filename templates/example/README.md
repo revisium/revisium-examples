@@ -44,7 +44,7 @@ explicit, reversible, and reproducible.
 | 3 | `cp .env.example .env` | Fill one `REVISIUM_URL` for local mode |
 | 4 | `npm run bootstrap:<example-script>` | Create tables, seed rows, and endpoints |
 | 5 | `cd project && npm install` | Install app dependencies |
-| 6 | `npm run build && npm run dev` | Start the example app (swap script for this framework) |
+| 6 | `npm run dev` | Start the example app (swap script for this framework) |
 
 ```bash
 # copy example env
@@ -88,7 +88,10 @@ Check for a running process before starting another:
 
 ```bash
 curl -fsS http://localhost:9222 >/dev/null && echo "standalone is up" || echo "start standalone first"
+# Unix/Linux/macOS:
 lsof -iTCP:9222 -sTCP:LISTEN
+# Windows PowerShell:
+# Get-NetTCPConnection -LocalPort 9222 -State Listen
 ```
 
 ## Architecture

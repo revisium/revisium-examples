@@ -29,10 +29,10 @@ and seed data stay at this example root, while `project/` contains the runnable 
 | 2 | `cp apps/mcp-knowledge-base/.env.example apps/mcp-knowledge-base/.env` | Fill one `REVISIUM_URL` |
 | 3 | `npx @revisium/standalone@latest` | Start writable local Revisium (`:9222`) |
 | 4 | `npm run bootstrap:mcp-kb` | Create KB tables, seed rows, and endpoints |
-| 5 | `cd apps/mcp-knowledge-base/project && npm install` | Install MCP server dependencies |
+| 5 | `cd apps/mcp-knowledge-base/project && cp .env.example .env && npm install` | Prepare MCP server env and dependencies |
 | 6 | `npm run build` | Build MCP server |
 | 7 | `npm start` | Run MCP server |
-| 8 | `claude mcp add --transport http revisium-local http://localhost:9222/mcp` | Register local MCP |
+| 8 | `claude mcp add revisium-kb --env REVISIUM_URL="$(grep '^REVISIUM_URL=' .env | cut -d= -f2-)" -- node "$(pwd)/dist/main.js"` | Register this stdio MCP server |
 
 ## See and Manage Data
 
@@ -55,6 +55,7 @@ npx @revisium/standalone@latest
 # terminal 2
 npm run bootstrap:mcp-kb
 cd apps/mcp-knowledge-base/project
+cp .env.example .env
 npm install
 npm run build
 npm start

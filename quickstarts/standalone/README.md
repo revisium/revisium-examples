@@ -48,7 +48,10 @@ Each app can target its own project under the same local org (`admin`) via diffe
 
 ```bash
 curl -fsS http://localhost:9222 >/dev/null && echo "standalone is already running" || echo "start standalone first"
+# Unix/Linux/macOS:
 lsof -iTCP:9222 -sTCP:LISTEN
+# Windows PowerShell:
+# Get-NetTCPConnection -LocalPort 9222 -State Listen
 ```
 
 ## Architecture
