@@ -18,7 +18,7 @@ Revisium Standalone process on `http://localhost:9222`.
 
 ## Prerequisites
 
-Install Node.js 22.13.0 or newer. Node.js includes `npm` and `npx`.
+Install Node.js >=22.13.0. Node.js includes `npm` and `npx`.
 
 Check your version:
 

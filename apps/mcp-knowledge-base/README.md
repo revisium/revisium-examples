@@ -15,7 +15,7 @@ config and seed data stay at this example root.
 
 ## Prerequisites
 
-- Node.js 22.13.0+
+- Node.js >=22.13.0
 - local Revisium Standalone on `http://localhost:9222`
 
 ## Run
@@ -35,14 +35,22 @@ cd apps/mcp-knowledge-base/project
 cp .env.example .env
 npm install
 npm run build
-npm start
 ```
 
-Register the built stdio server from `apps/mcp-knowledge-base/project`:
+Run the MCP registration command from `apps/mcp-knowledge-base/project`:
 
 ```bash
 claude mcp add revisium-kb --env REVISIUM_URL="$(grep '^REVISIUM_URL=' .env | cut -d= -f2-)" -- node "$(pwd)/dist/main.js"
 ```
+
+Terminal 3:
+
+```bash
+cd apps/mcp-knowledge-base/project
+npm start
+```
+
+Run `npm start` last so it does not block the registration command.
 
 Stop standalone from terminal 1 with `Ctrl+C`.
 

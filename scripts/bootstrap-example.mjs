@@ -3,6 +3,8 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { RevisiumClient } from "@revisium/client";
 
+const PAGE_SIZE = 1000;
+
 const revisiumUrlPattern = /^revisium(?:\+(http|https))?:\/\//;
 const localHosts = new Set(["localhost", "127.0.0.1", "::1"]);
 
@@ -69,8 +71,7 @@ async function ensureProject(client, connection) {
 }
 
 export async function ensureTables(draft, tables) {
-  const existingTables = await draft.getTables({ first: 1000 });
-  const existingTableIds = new Set(existingTables.edges.map(({ node }) => node.id));
+  const existingTableIds = await getAllTableIds(draft);
 
   for (const table of tables) {
     if (existingTableIds.has(table.id)) {
@@ -122,11 +123,52 @@ export async function ensureRows(draft, rows, tables) {
 
 async function getExistingRowIds(draft, cache, tableId) {
   if (!cache.has(tableId)) {
-    const existingRows = await draft.getRows(tableId, { first: 1000 });
-    cache.set(tableId, new Set(existingRows.edges.map(({ node }) => node.id)));
+    const existingRows = await getAllRowIds(draft, tableId);
+    cache.set(tableId, existingRows);
   }
 
   return cache.get(tableId);
+}
+
+async function getAllTableIds(draft) {
+  const ids = new Set();
+  let after;
+  let hasMore = true;
+
+  while (hasMore) {
+    const response = await draft.getTables({ first: PAGE_SIZE, ...(after ? { after } : {}) });
+
+    for (const { node } of response.edges) {
+      ids.add(node.id);
+    }
+
+    hasMore = Boolean(response.pageInfo?.hasNextPage);
+    after = response.pageInfo?.endCursor;
+  }
+
+  return ids;
+}
+
+async function getAllRowIds(draft, tableId) {
+  const ids = new Set();
+  let after;
+  let hasMore = true;
+
+  while (hasMore) {
+    const response = await draft.getRows(tableId, {
+      first: PAGE_SIZE,
+      ...(after ? { after } : {}),
+    });
+
+    for (const { node } of response.edges) {
+      ids.add(node.id);
+    }
+
+    hasMore = Boolean(response.pageInfo?.hasNextPage);
+    after = response.pageInfo?.endCursor;
+  }
+
+  return ids;
 }
 
 export function hydrateSchemaDefaults(schema, data) {

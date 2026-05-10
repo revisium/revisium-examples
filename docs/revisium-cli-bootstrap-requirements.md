@@ -50,7 +50,7 @@ Each app has:
 
 Recommended local bootstrap flow for all apps:
 
-1. Install Node.js 22.13.0+.
+1. Install Node.js >=22.13.0.
 2. Start Revisium locally with `npx @revisium/standalone@latest`.
 3. Run `npm run bootstrap:all`, or run one `npm run bootstrap:<example-script>` command at a time.
 4. Inspect and edit data in `http://localhost:9222`.
