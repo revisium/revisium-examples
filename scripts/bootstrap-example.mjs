@@ -21,17 +21,14 @@ function loadEnvFile(envPath) {
 export function connectionFromEnv(config) {
   const parsedUrl = parseConnectionTarget(process.env.REVISIUM_URL ?? config.defaultUrl ?? "");
   const baseUrl = parsedUrl.baseUrl;
-  const defaultLocalUsername = isLocalUrl(baseUrl) ? "admin" : "";
-  const defaultLocalPassword = isLocalUrl(baseUrl) ? "admin" : "";
-
   return {
     baseUrl,
     organizationId: parsedUrl.organizationId ?? config.organizationId ?? "admin",
     projectName: parsedUrl.projectName ?? config.projectName,
     branchName: parsedUrl.branchName ?? config.branchName ?? "master",
     revisionName: parsedUrl.revisionName ?? config.revisionName ?? "draft",
-    username: parsedUrl.username ?? process.env.REVISIUM_USERNAME ?? config.username ?? defaultLocalUsername,
-    password: parsedUrl.password ?? process.env.REVISIUM_PASSWORD ?? config.password ?? defaultLocalPassword,
+    username: parsedUrl.username ?? process.env.REVISIUM_USERNAME ?? config.username ?? "",
+    password: parsedUrl.password ?? process.env.REVISIUM_PASSWORD ?? config.password ?? "",
     token: parsedUrl.token ?? process.env.REVISIUM_TOKEN ?? "",
     apiKey: parsedUrl.apiKey ?? process.env.REVISIUM_API_KEY ?? "",
   };
@@ -48,7 +45,9 @@ async function authenticate(client, connection) {
     return;
   }
 
-  await client.login(connection.username, connection.password);
+  if (connection.username && connection.password) {
+    await client.login(connection.username, connection.password);
+  }
 }
 
 async function ensureProject(client, connection) {
@@ -299,7 +298,7 @@ function assertConnection(connection) {
     throw new Error("Remote Revisium targets must include ?apikey=... or ?token=...");
   }
 
-  if (!connection.apiKey && !connection.token && (!connection.username || !connection.password)) {
+  if (!isLocalUrl(connection.baseUrl) && !connection.apiKey && !connection.token && (!connection.username || !connection.password)) {
     throw new Error("Revisium targets must include user:password, ?apikey=..., or ?token=...");
   }
 }

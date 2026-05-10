@@ -47,22 +47,27 @@ Open the Admin UI:
 http://localhost:9222
 ```
 
-Default local credentials are `admin` / `admin`.
+Local standalone runs without auth by default.
+
+Bootstrap scripts use the committed CLI workspace config at
+[.revisium/revisium-cli.config.json](./.revisium/revisium-cli.config.json).
+The config stores only local target metadata and `authMode: "none"`; it does not
+store credentials.
 
 Bootstrap demo data in terminal 2:
 
 ```bash
-npm run bootstrap:nestjs
-npm run bootstrap:nextjs
-npm run bootstrap:react
-npm run bootstrap:mcp-kb
+npm run bootstrap:all
 ```
 
-You can run one bootstrap command or all of them. Each demo uses a separate
-project under the local `admin` organization:
+You can run one bootstrap command or all demos with `bootstrap:all`. Run
+bootstrap commands sequentially; one standalone process can host every demo, but
+parallel writes can conflict while projects are being created. Each demo uses a
+separate project under the local `admin` organization:
 
 | Command | Project |
 | --- | --- |
+| `npm run bootstrap:all` | all projects below |
 | `npm run bootstrap:nestjs` | `dictionary` |
 | `npm run bootstrap:nextjs` | `web-config` |
 | `npm run bootstrap:react` | `frontend-config` |
@@ -196,7 +201,8 @@ Each example must include:
 - standalone-only `modes: ["standalone"]`
 - application examples: `.env.example`, `bootstrap.config.json`, and `scripts/bootstrap.mjs`
 - runnable app examples: `project/README.md`, `project/package.json`, and source files under the framework-standard source folder
-- application `.env.example` files using one `REVISIUM_URL` in `revisium://user:password@host:port/org/project/branch` format
+- application `.env.example` files using one `REVISIUM_URL` in `revisium://host:port/org/project/branch` format
+- local CLI targets in `.revisium/revisium-cli.config.json` with `authMode: "none"`
 - no real secrets or customer data
 - a verification command or manual smoke test
 

@@ -46,7 +46,7 @@ async function connect(target: RevisiumTarget): Promise<RevisionScope> {
     client.loginWithApiKey(target.apiKey);
   } else if (target.token) {
     client.loginWithToken(target.token);
-  } else {
+  } else if (target.username && target.password) {
     await client.login(target.username, target.password);
   }
 

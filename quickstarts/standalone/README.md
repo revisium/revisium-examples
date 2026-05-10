@@ -31,17 +31,29 @@ Open:
 http://localhost:9222
 ```
 
-Default local credentials are `admin` / `admin`.
+Local standalone runs without auth by default.
+
+The repository commits `.revisium/revisium-cli.config.json`, so bootstrap
+commands can use named local contexts without `--url` or auth flags.
 
 Bootstrap demos from terminal 2:
 
 ```bash
 npm install
+npm run bootstrap:all
+```
+
+Or run individual demos one at a time:
+
+```bash
 npm run bootstrap:nestjs
 npm run bootstrap:nextjs
 npm run bootstrap:react
 npm run bootstrap:mcp-kb
 ```
+
+Use one standalone process for all demos. Keep bootstrap commands sequential so
+project creation and commits do not race each other.
 
 Stop standalone from terminal 1:
 
@@ -85,10 +97,9 @@ The app examples create these local projects:
 ## Create Data Manually
 
 1. Open `http://localhost:9222`.
-2. Sign in with `admin` / `admin`.
-3. Create a project.
-4. Create tables and rows.
-5. Commit the revision so generated endpoints can read `master/head`.
+2. Create a project.
+3. Create tables and rows.
+4. Commit the revision so generated endpoints can read `master/head`.
 
 ## Verify
 

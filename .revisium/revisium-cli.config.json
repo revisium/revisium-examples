@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "currentContext": "dictionary",
+  "instances": {
+    "local": {
+      "baseUrl": "http://localhost:9222",
+      "authMode": "none"
+    }
+  },
+  "contexts": {
+    "dictionary": {
+      "instance": "local",
+      "organization": "admin",
+      "project": "dictionary",
+      "branch": "master",
+      "revision": "draft"
+    },
+    "dictionary-head": {
+      "instance": "local",
+      "organization": "admin",
+      "project": "dictionary",
+      "branch": "master",
+      "revision": "head"
+    },
+    "web-config": {
+      "instance": "local",
+      "organization": "admin",
+      "project": "web-config",
+      "branch": "master",
+      "revision": "draft"
+    },
+    "web-config-head": {
+      "instance": "local",
+      "organization": "admin",
+      "project": "web-config",
+      "branch": "master",
+      "revision": "head"
+    },
+    "frontend-config": {
+      "instance": "local",
+      "organization": "admin",
+      "project": "frontend-config",
+      "branch": "master",
+      "revision": "draft"
+    },
+    "frontend-config-head": {
+      "instance": "local",
+      "organization": "admin",
+      "project": "frontend-config",
+      "branch": "master",
+      "revision": "head"
+    },
+    "knowledge-base": {
+      "instance": "local",
+      "organization": "admin",
+      "project": "knowledge-base",
+      "branch": "master",
+      "revision": "draft"
+    },
+    "knowledge-base-head": {
+      "instance": "local",
+      "organization": "admin",
+      "project": "knowledge-base",
+      "branch": "master",
+      "revision": "head"
+    }
+  }
+}

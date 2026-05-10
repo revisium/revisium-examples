@@ -29,7 +29,6 @@ Terminal 2:
 
 ```bash
 npm install
-cp apps/react-feature-flags/.env.example apps/react-feature-flags/.env
 npm run bootstrap:react
 cd apps/react-feature-flags/project
 cp .env.example .env
@@ -95,7 +94,7 @@ Recommended flag row IDs:
 Bootstrap writes to draft:
 
 ```env
-REVISIUM_URL=revisium://admin:admin@localhost:9222/admin/frontend-config/master
+REVISIUM_URL=revisium://localhost:9222/admin/frontend-config/master
 ```
 
 The browser app reads the generated public endpoint:

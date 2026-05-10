@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const manifestPath = join(root, "examples.json");
+const cliConfigPath = join(root, ".revisium", "revisium-cli.config.json");
 
 function readJson(path) {
   return JSON.parse(readFileSync(path, "utf8"));
@@ -51,6 +52,7 @@ const requiredCapabilityRows = [
   "MCP",
 ];
 const errors = [];
+const cliConfig = existsSync(cliConfigPath) ? readJson(cliConfigPath) : undefined;
 
 function validateBootstrapConfig(example, exampleDir) {
   const configPath = join(exampleDir, "bootstrap.config.json");
@@ -77,6 +79,9 @@ function validateBootstrapConfig(example, exampleDir) {
 
   if (typeof config.defaultUrl === "string" && !config.defaultUrl.startsWith("revisium://")) {
     errors.push(`${example.path}/bootstrap.config.json defaultUrl should use revisium:// format`);
+  }
+  if (typeof config.defaultUrl === "string" && /^revisium:\/\/[^/\s]+@localhost:9222\//.test(config.defaultUrl)) {
+    errors.push(`${example.path}/bootstrap.config.json defaultUrl should not include credentials for local standalone`);
   }
   if ("defaultBaseUrl" in config) {
     errors.push(`${example.path}/bootstrap.config.json should use defaultUrl instead of defaultBaseUrl`);
@@ -124,11 +129,52 @@ function validateEnvExample(example, exampleDir) {
   if (!/^REVISIUM_URL=revisium:\/\//m.test(envExample)) {
     errors.push(`${example.path}/.env.example should use a single revisium:// REVISIUM_URL`);
   }
+  if (/^REVISIUM_URL=revisium:\/\/[^/\s]+@localhost:9222\//m.test(envExample)) {
+    errors.push(`${example.path}/.env.example should not include credentials for local standalone`);
+  }
 
   for (const envName of legacyConnectionEnvNames) {
     if (new RegExp(`^${envName}=`, "m").test(envExample)) {
       errors.push(`${example.path}/.env.example should not split Revisium URL into ${envName}`);
     }
+  }
+}
+
+function readBootstrapScriptContext(example, exampleDir) {
+  const scriptPath = join(exampleDir, "scripts", "bootstrap.mjs");
+  if (!existsSync(scriptPath)) {
+    return undefined;
+  }
+
+  const script = readFileSync(scriptPath, "utf8");
+  return script.match(/runCliBootstrap\([^,]+,\s*"([^"]+)"/)?.[1];
+}
+
+function validateCliWorkspaceConfig() {
+  if (!cliConfig) {
+    errors.push(".revisium/revisium-cli.config.json is required for local bootstrap scripts");
+    return;
+  }
+
+  if (!isJsonObject(cliConfig)) {
+    errors.push(".revisium/revisium-cli.config.json must be a JSON object");
+    return;
+  }
+
+  const localInstance = cliConfig.instances?.local;
+  if (!isJsonObject(localInstance)) {
+    errors.push(".revisium/revisium-cli.config.json must define instances.local");
+  } else {
+    if (localInstance.baseUrl !== "http://localhost:9222") {
+      errors.push(".revisium/revisium-cli.config.json instances.local.baseUrl must be http://localhost:9222");
+    }
+    if (localInstance.authMode !== "none") {
+      errors.push('.revisium/revisium-cli.config.json instances.local.authMode must be "none"');
+    }
+  }
+
+  if (!isJsonObject(cliConfig.contexts)) {
+    errors.push(".revisium/revisium-cli.config.json must define contexts");
   }
 }
 
@@ -139,6 +185,8 @@ if (!isJsonObject(manifest)) {
 if (isJsonObject(manifest) && !Array.isArray(manifest.examples)) {
   errors.push("examples.json must contain an examples array");
 }
+
+validateCliWorkspaceConfig();
 
 const ids = new Set();
 const examples = isJsonObject(manifest) && Array.isArray(manifest.examples) ? manifest.examples : [];
@@ -229,6 +277,25 @@ for (const [index, example] of examples.entries()) {
 
     validateBootstrapConfig(example, exampleDir);
     validateEnvExample(example, exampleDir);
+
+    const bootstrapConfigPath = join(exampleDir, "bootstrap.config.json");
+    if (existsSync(bootstrapConfigPath) && isJsonObject(cliConfig?.contexts)) {
+      const bootstrapConfig = readJson(bootstrapConfigPath);
+      const expectedContext = readBootstrapScriptContext(example, exampleDir);
+      const context = expectedContext ? cliConfig.contexts[expectedContext] : undefined;
+      if (!context) {
+        errors.push(`${example.path} bootstrap script should call runCliBootstrap with a configured CLI context`);
+      } else if (context.instance !== "local" || context.organization !== "admin" || context.project !== bootstrapConfig.projectName || context.branch !== bootstrapConfig.branchName || context.revision !== "draft") {
+        errors.push(`${example.path} CLI context ${expectedContext} does not match bootstrap.config.json`);
+      }
+
+      const headContext = expectedContext ? cliConfig.contexts[`${expectedContext}-head`] : undefined;
+      if (!headContext) {
+        errors.push(`${example.path} is missing CLI head context ${expectedContext}-head`);
+      } else if (headContext.instance !== "local" || headContext.organization !== "admin" || headContext.project !== bootstrapConfig.projectName || headContext.branch !== bootstrapConfig.branchName || headContext.revision !== "head") {
+        errors.push(`${example.path} CLI head context ${expectedContext}-head does not match bootstrap.config.json`);
+      }
+    }
   }
 }
 

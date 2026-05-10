@@ -1,5 +1,5 @@
 {
-  "defaultUrl": "revisium://admin:admin@localhost:9222/admin/knowledge-base/master",
+  "defaultUrl": "revisium://localhost:9222/admin/knowledge-base/master",
   "organizationId": "admin",
   "projectName": "knowledge-base",
   "branchName": "master",

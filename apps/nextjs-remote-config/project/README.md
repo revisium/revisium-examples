@@ -24,7 +24,7 @@ revisium://[user:password@]host[:port]/organization/project/branch[:revision][?t
 Standalone:
 
 ```env
-REVISIUM_URL=revisium://admin:admin@localhost:9222/admin/web-config/master:head
+REVISIUM_URL=revisium://localhost:9222/admin/web-config/master:head
 ```
 
 ## Run

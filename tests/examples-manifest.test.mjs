@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const manifest = JSON.parse(readFileSync(join(root, "examples.json"), "utf8"));
+const cliConfig = JSON.parse(readFileSync(join(root, ".revisium", "revisium-cli.config.json"), "utf8"));
 const allowedStatuses = new Set(["bootstrap", "reference", "researched"]);
 const legacyConnectionEnvNames = [
   "REVISIUM_ORG",
@@ -52,9 +53,50 @@ test("application examples expose bootstrap inputs", () => {
 
     const envExample = readFileSync(envPath, "utf8");
     assert.match(envExample, /^REVISIUM_URL=revisium:\/\//m, `${example.path} must use one Revisium URL`);
+    assert.doesNotMatch(
+      envExample,
+      /^REVISIUM_URL=revisium:\/\/[^/\s]+@localhost:9222\//m,
+      `${example.path} should not include credentials for local standalone`,
+    );
 
     for (const envName of legacyConnectionEnvNames) {
       assert.doesNotMatch(envExample, new RegExp(`^${envName}=`, "m"), `${example.path} should not split Revisium URL into ${envName}`);
     }
+  }
+});
+
+test("workspace CLI config exposes no-auth local bootstrap contexts", () => {
+  assert.equal(cliConfig.instances.local.baseUrl, "http://localhost:9222");
+  assert.equal(cliConfig.instances.local.authMode, "none");
+
+  for (const example of manifest.examples.filter((item) => item.category === "application")) {
+    const exampleDir = join(root, example.path);
+    const bootstrapConfig = JSON.parse(readFileSync(join(exampleDir, "bootstrap.config.json"), "utf8"));
+    const script = readFileSync(join(exampleDir, "scripts", "bootstrap.mjs"), "utf8");
+    const contextName = script.match(/runCliBootstrap\([^,]+,\s*"([^"]+)"/)?.[1];
+
+    assert.ok(contextName, `${example.path} bootstrap script should select a CLI context`);
+    assert.deepEqual(
+      cliConfig.contexts[contextName],
+      {
+        instance: "local",
+        organization: "admin",
+        project: bootstrapConfig.projectName,
+        branch: bootstrapConfig.branchName,
+        revision: "draft",
+      },
+      `${example.path} CLI context should match bootstrap config`,
+    );
+    assert.deepEqual(
+      cliConfig.contexts[`${contextName}-head`],
+      {
+        instance: "local",
+        organization: "admin",
+        project: bootstrapConfig.projectName,
+        branch: bootstrapConfig.branchName,
+        revision: "head",
+      },
+      `${example.path} CLI head context should match bootstrap config`,
+    );
   }
 });

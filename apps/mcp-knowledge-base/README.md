@@ -30,7 +30,6 @@ Terminal 2:
 
 ```bash
 npm install
-cp apps/mcp-knowledge-base/.env.example apps/mcp-knowledge-base/.env
 npm run bootstrap:mcp-kb
 cd apps/mcp-knowledge-base/project
 cp .env.example .env
@@ -99,14 +98,14 @@ Bootstrap creates project `knowledge-base` with tables such as:
 Bootstrap writes to draft:
 
 ```env
-REVISIUM_URL=revisium://admin:admin@localhost:9222/admin/knowledge-base/master
+REVISIUM_URL=revisium://localhost:9222/admin/knowledge-base/master
 REVISIUM_MCP_URL=http://localhost:9222/mcp
 ```
 
 Runtime reads committed `head`:
 
 ```env
-REVISIUM_URL=revisium://admin:admin@localhost:9222/admin/knowledge-base/master:head
+REVISIUM_URL=revisium://localhost:9222/admin/knowledge-base/master:head
 ```
 
 ## See and Manage Data

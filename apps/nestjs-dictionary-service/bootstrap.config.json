@@ -1,5 +1,5 @@
 {
-  "defaultUrl": "revisium://admin:admin@localhost:9222/admin/dictionary/master",
+  "defaultUrl": "revisium://localhost:9222/admin/dictionary/master",
   "organizationId": "admin",
   "projectName": "dictionary",
   "branchName": "master",
