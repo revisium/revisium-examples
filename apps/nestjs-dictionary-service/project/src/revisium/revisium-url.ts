@@ -4,8 +4,8 @@ export interface RevisiumTarget {
   projectName: string;
   branchName: string;
   revisionName: string;
-  username: string;
-  password: string;
+  username?: string;
+  password?: string;
   token?: string;
   apiKey?: string;
 }
@@ -31,11 +31,15 @@ export function parseRevisiumUrl(value: string | undefined): RevisiumTarget {
     projectName,
     branchName,
     revisionName,
-    username: decodeURIComponent(url.username),
-    password: decodeURIComponent(url.password),
+    username: decodeUrlPart(url.username),
+    password: decodeUrlPart(url.password),
     token: url.searchParams.get("token") ?? undefined,
     apiKey: url.searchParams.get("apikey") ?? undefined,
   };
+}
+
+function decodeUrlPart(value: string): string | undefined {
+  return value ? decodeURIComponent(value) : undefined;
 }
 
 function protocolFor(url: URL): "http" | "https" {

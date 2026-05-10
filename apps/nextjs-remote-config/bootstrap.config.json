@@ -1,5 +1,5 @@
 {
-  "defaultUrl": "revisium://admin:admin@localhost:9222/admin/web-config/master",
+  "defaultUrl": "revisium://localhost:9222/admin/web-config/master",
   "organizationId": "admin",
   "projectName": "web-config",
   "branchName": "master",

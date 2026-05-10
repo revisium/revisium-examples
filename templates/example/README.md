@@ -28,7 +28,6 @@ Terminal 2:
 
 ```bash
 npm install
-cp apps/example-id/.env.example apps/example-id/.env
 npm run bootstrap:example-id
 ```
 
@@ -78,13 +77,13 @@ Use one base Revisium target with phase-specific revisions.
 Bootstrap writes to draft:
 
 ```env
-REVISIUM_URL=revisium://admin:admin@localhost:9222/admin/example-project/master
+REVISIUM_URL=revisium://localhost:9222/admin/example-project/master
 ```
 
 Runtime apps read committed data with `:head`:
 
 ```env
-REVISIUM_URL=revisium://admin:admin@localhost:9222/admin/example-project/master:head
+REVISIUM_URL=revisium://localhost:9222/admin/example-project/master:head
 ```
 
 ## See and Manage Data

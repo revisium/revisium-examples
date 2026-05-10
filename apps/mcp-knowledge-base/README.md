@@ -15,7 +15,7 @@ config and seed data stay at this example root.
 
 ## Prerequisites
 
-- Node.js 22.13.0+
+- Node.js >=22.13.0
 - local Revisium Standalone on `http://localhost:9222`
 
 ## Run
@@ -30,20 +30,27 @@ Terminal 2:
 
 ```bash
 npm install
-cp apps/mcp-knowledge-base/.env.example apps/mcp-knowledge-base/.env
 npm run bootstrap:mcp-kb
 cd apps/mcp-knowledge-base/project
 cp .env.example .env
 npm install
 npm run build
-npm start
 ```
 
-Register the built stdio server from `apps/mcp-knowledge-base/project`:
+Run the MCP registration command from `apps/mcp-knowledge-base/project`:
 
 ```bash
 claude mcp add revisium-kb --env REVISIUM_URL="$(grep '^REVISIUM_URL=' .env | cut -d= -f2-)" -- node "$(pwd)/dist/main.js"
 ```
+
+Terminal 3:
+
+```bash
+cd apps/mcp-knowledge-base/project
+npm start
+```
+
+Run `npm start` last so it does not block the registration command.
 
 Stop standalone from terminal 1 with `Ctrl+C`.
 
@@ -99,14 +106,14 @@ Bootstrap creates project `knowledge-base` with tables such as:
 Bootstrap writes to draft:
 
 ```env
-REVISIUM_URL=revisium://admin:admin@localhost:9222/admin/knowledge-base/master
+REVISIUM_URL=revisium://localhost:9222/admin/knowledge-base/master
 REVISIUM_MCP_URL=http://localhost:9222/mcp
 ```
 
 Runtime reads committed `head`:
 
 ```env
-REVISIUM_URL=revisium://admin:admin@localhost:9222/admin/knowledge-base/master:head
+REVISIUM_URL=revisium://localhost:9222/admin/knowledge-base/master:head
 ```
 
 ## See and Manage Data

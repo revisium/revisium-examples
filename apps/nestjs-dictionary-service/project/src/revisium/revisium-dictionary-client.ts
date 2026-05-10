@@ -29,8 +29,10 @@ export class RevisiumDictionaryClient {
       this.client.loginWithApiKey(target.apiKey);
     } else if (target.token) {
       this.client.loginWithToken(target.token);
-    } else {
+    } else if (target.username && target.password) {
       await this.client.login(target.username, target.password);
+    } else if (target.username || target.password) {
+      throw new Error("REVISIUM_URL must include both username and password for basic auth.");
     }
 
     return this.client.revision({

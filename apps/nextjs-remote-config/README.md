@@ -30,7 +30,6 @@ Terminal 2:
 
 ```bash
 npm install
-cp apps/nextjs-remote-config/.env.example apps/nextjs-remote-config/.env
 npm run bootstrap:nextjs
 cd apps/nextjs-remote-config/project
 cp .env.example .env
@@ -92,13 +91,13 @@ Bootstrap creates project `web-config` with these tables:
 Bootstrap writes to draft:
 
 ```env
-REVISIUM_URL=revisium://admin:admin@localhost:9222/admin/web-config/master
+REVISIUM_URL=revisium://localhost:9222/admin/web-config/master
 ```
 
 Runtime reads committed `head`:
 
 ```env
-REVISIUM_URL=revisium://admin:admin@localhost:9222/admin/web-config/master:head
+REVISIUM_URL=revisium://localhost:9222/admin/web-config/master:head
 ```
 
 ## See and Manage Data

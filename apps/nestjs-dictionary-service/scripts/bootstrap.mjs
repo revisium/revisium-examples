@@ -1,3 +1,3 @@
-import { bootstrapExample, configUrl } from "../../../scripts/bootstrap-example.mjs";
+import { runCliBootstrap } from "../../../scripts/bootstrap-cli.mjs";
 
-await bootstrapExample(configUrl("../bootstrap.config.json", import.meta.url));
+runCliBootstrap("apps/nestjs-dictionary-service/bootstrap.config.json", "dictionary");

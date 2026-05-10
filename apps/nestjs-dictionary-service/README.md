@@ -29,7 +29,6 @@ Terminal 2:
 
 ```bash
 npm install
-cp apps/nestjs-dictionary-service/.env.example apps/nestjs-dictionary-service/.env
 npm run bootstrap:nestjs
 cd apps/nestjs-dictionary-service/project
 cp .env.example .env
@@ -93,13 +92,13 @@ Bootstrap creates project `dictionary` with these tables:
 Bootstrap writes to draft:
 
 ```env
-REVISIUM_URL=revisium://admin:admin@localhost:9222/admin/dictionary/master
+REVISIUM_URL=revisium://localhost:9222/admin/dictionary/master
 ```
 
 Runtime reads committed `head`:
 
 ```env
-REVISIUM_URL=revisium://admin:admin@localhost:9222/admin/dictionary/master:head
+REVISIUM_URL=revisium://localhost:9222/admin/dictionary/master:head
 PORT=3000
 ```
 

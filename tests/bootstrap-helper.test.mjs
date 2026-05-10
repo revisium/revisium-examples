@@ -8,16 +8,17 @@ import {
   parseConnectionTarget,
   parseRevisiumUrl,
 } from "../scripts/bootstrap-example.mjs";
+import { prepareCliBootstrapConfig } from "../scripts/bootstrap-cli.mjs";
 
 test("parseRevisiumUrl follows revisium-cli localhost protocol detection", () => {
-  assert.deepEqual(parseRevisiumUrl("revisium://admin:secret@localhost:9222/admin/dictionary/master"), {
+  assert.deepEqual(parseRevisiumUrl("revisium://localhost:9222/admin/dictionary/master"), {
     baseUrl: "http://localhost:9222",
     organizationId: "admin",
     projectName: "dictionary",
     branchName: "master",
     revisionName: undefined,
-    username: "admin",
-    password: "secret",
+    username: undefined,
+    password: undefined,
     token: undefined,
     apiKey: undefined,
   });
@@ -57,7 +58,7 @@ test("parseConnectionTarget preserves legacy HTTP base URL targets", () => {
   });
 });
 
-test("connectionFromEnv defaults local standalone auth to admin credentials", () => {
+test("connectionFromEnv keeps local standalone auth optional", () => {
   const previous = {
     REVISIUM_API_KEY: process.env.REVISIUM_API_KEY,
     REVISIUM_PASSWORD: process.env.REVISIUM_PASSWORD,
@@ -83,8 +84,8 @@ test("connectionFromEnv defaults local standalone auth to admin credentials", ()
         projectName: "frontend-config",
         branchName: "master",
         revisionName: "draft",
-        username: "admin",
-        password: "admin",
+        username: "",
+        password: "",
         token: "",
         apiKey: "",
       },
@@ -131,6 +132,57 @@ test("hydrateSchemaDefaults fills computed defaults in nested arrays and objects
       items: [{ name: "one", position: 0 }],
     },
   );
+});
+
+test("prepareCliBootstrapConfig hydrates computed values for stable CLI row comparisons", () => {
+  const config = {
+    tables: [
+      {
+        id: "Example",
+        schema: {
+          type: "object",
+          properties: {
+            enabled: { type: "boolean", default: false },
+            rollout: { type: "number", default: 0 },
+            tags: { type: "array", items: { type: "string", default: "" } },
+            rules: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  weight: { type: "number", default: 0 },
+                  position: { type: "number", readOnly: true, default: 0, "x-formula": { version: 1, expression: "#index + 1" } },
+                },
+              },
+            },
+            isLive: { type: "boolean", readOnly: true, default: false, "x-formula": { version: 1, expression: "enabled && rollout >= 100" } },
+            primaryTag: { type: "string", readOnly: true, default: "", "x-formula": { version: 1, expression: "tags[0]" } },
+            totalWeight: { type: "number", readOnly: true, default: 0, "x-formula": { version: 1, expression: "sum(rules[*].weight)" } },
+          },
+        },
+      },
+    ],
+    rows: [
+      {
+        tableId: "Example",
+        rowId: "row-1",
+        data: { enabled: true, rollout: 100, tags: ["alpha"], rules: [{ weight: 40 }, { weight: 60 }] },
+      },
+    ],
+  };
+
+  assert.deepEqual(prepareCliBootstrapConfig(config).rows[0].data, {
+    enabled: true,
+    rollout: 100,
+    tags: ["alpha"],
+    rules: [
+      { weight: 40, position: 1 },
+      { weight: 60, position: 2 },
+    ],
+    isLive: true,
+    primaryTag: "alpha",
+    totalWeight: 100,
+  });
 });
 
 test("ensureTables treats create conflicts as existing tables", async () => {

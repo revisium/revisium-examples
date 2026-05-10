@@ -3,6 +3,8 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { RevisiumClient } from "@revisium/client";
 
+const PAGE_SIZE = 1000;
+
 const revisiumUrlPattern = /^revisium(?:\+(http|https))?:\/\//;
 const localHosts = new Set(["localhost", "127.0.0.1", "::1"]);
 
@@ -21,17 +23,14 @@ function loadEnvFile(envPath) {
 export function connectionFromEnv(config) {
   const parsedUrl = parseConnectionTarget(process.env.REVISIUM_URL ?? config.defaultUrl ?? "");
   const baseUrl = parsedUrl.baseUrl;
-  const defaultLocalUsername = isLocalUrl(baseUrl) ? "admin" : "";
-  const defaultLocalPassword = isLocalUrl(baseUrl) ? "admin" : "";
-
   return {
     baseUrl,
     organizationId: parsedUrl.organizationId ?? config.organizationId ?? "admin",
     projectName: parsedUrl.projectName ?? config.projectName,
     branchName: parsedUrl.branchName ?? config.branchName ?? "master",
     revisionName: parsedUrl.revisionName ?? config.revisionName ?? "draft",
-    username: parsedUrl.username ?? process.env.REVISIUM_USERNAME ?? config.username ?? defaultLocalUsername,
-    password: parsedUrl.password ?? process.env.REVISIUM_PASSWORD ?? config.password ?? defaultLocalPassword,
+    username: parsedUrl.username ?? process.env.REVISIUM_USERNAME ?? config.username ?? "",
+    password: parsedUrl.password ?? process.env.REVISIUM_PASSWORD ?? config.password ?? "",
     token: parsedUrl.token ?? process.env.REVISIUM_TOKEN ?? "",
     apiKey: parsedUrl.apiKey ?? process.env.REVISIUM_API_KEY ?? "",
   };
@@ -48,7 +47,9 @@ async function authenticate(client, connection) {
     return;
   }
 
-  await client.login(connection.username, connection.password);
+  if (connection.username && connection.password) {
+    await client.login(connection.username, connection.password);
+  }
 }
 
 async function ensureProject(client, connection) {
@@ -70,8 +71,7 @@ async function ensureProject(client, connection) {
 }
 
 export async function ensureTables(draft, tables) {
-  const existingTables = await draft.getTables({ first: 1000 });
-  const existingTableIds = new Set(existingTables.edges.map(({ node }) => node.id));
+  const existingTableIds = await getAllTableIds(draft);
 
   for (const table of tables) {
     if (existingTableIds.has(table.id)) {
@@ -123,11 +123,52 @@ export async function ensureRows(draft, rows, tables) {
 
 async function getExistingRowIds(draft, cache, tableId) {
   if (!cache.has(tableId)) {
-    const existingRows = await draft.getRows(tableId, { first: 1000 });
-    cache.set(tableId, new Set(existingRows.edges.map(({ node }) => node.id)));
+    const existingRows = await getAllRowIds(draft, tableId);
+    cache.set(tableId, existingRows);
   }
 
   return cache.get(tableId);
+}
+
+async function getAllTableIds(draft) {
+  const ids = new Set();
+  let after;
+  let hasMore = true;
+
+  while (hasMore) {
+    const response = await draft.getTables({ first: PAGE_SIZE, ...(after ? { after } : {}) });
+
+    for (const { node } of response.edges) {
+      ids.add(node.id);
+    }
+
+    hasMore = Boolean(response.pageInfo?.hasNextPage);
+    after = response.pageInfo?.endCursor;
+  }
+
+  return ids;
+}
+
+async function getAllRowIds(draft, tableId) {
+  const ids = new Set();
+  let after;
+  let hasMore = true;
+
+  while (hasMore) {
+    const response = await draft.getRows(tableId, {
+      first: PAGE_SIZE,
+      ...(after ? { after } : {}),
+    });
+
+    for (const { node } of response.edges) {
+      ids.add(node.id);
+    }
+
+    hasMore = Boolean(response.pageInfo?.hasNextPage);
+    after = response.pageInfo?.endCursor;
+  }
+
+  return ids;
 }
 
 export function hydrateSchemaDefaults(schema, data) {
@@ -295,11 +336,16 @@ function assertConnection(connection) {
     throw new Error("Missing branch in REVISIUM_URL or defaultUrl.");
   }
 
-  if (!isLocalUrl(connection.baseUrl) && !connection.apiKey && !connection.token) {
-    throw new Error("Remote Revisium targets must include ?apikey=... or ?token=...");
+  if (
+    !isLocalUrl(connection.baseUrl) &&
+    !connection.apiKey &&
+    !connection.token &&
+    !(connection.username && connection.password)
+  ) {
+    throw new Error("Revisium targets must include user:password, ?apikey=..., or ?token=...");
   }
 
-  if (!connection.apiKey && !connection.token && (!connection.username || !connection.password)) {
+  if (!isLocalUrl(connection.baseUrl) && !connection.apiKey && !connection.token && (!connection.username || !connection.password)) {
     throw new Error("Revisium targets must include user:password, ?apikey=..., or ?token=...");
   }
 }
