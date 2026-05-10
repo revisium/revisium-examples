@@ -84,6 +84,11 @@ function applyComputedFields(schema, data, rootData, itemIndex) {
 function evaluateFormula(expression, currentData, rootData, itemIndex) {
   const trimmed = expression.trim();
 
+  // Supported operators are limited and parsed in a simple precedence list:
+  // `&&` -> `>=` -> `+` -> `*`.
+  // This handles typical demo formulas (comparisons, sums, constants, simple
+  // computed helpers). For mixed arithmetic, add support for grouping explicitly.
+
   if (trimmed.includes(" && ")) {
     return trimmed.split(" && ").every((part) => Boolean(evaluateFormula(part, currentData, rootData, itemIndex)));
   }

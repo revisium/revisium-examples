@@ -336,8 +336,13 @@ function assertConnection(connection) {
     throw new Error("Missing branch in REVISIUM_URL or defaultUrl.");
   }
 
-  if (!isLocalUrl(connection.baseUrl) && !connection.apiKey && !connection.token) {
-    throw new Error("Remote Revisium targets must include ?apikey=... or ?token=...");
+  if (
+    !isLocalUrl(connection.baseUrl) &&
+    !connection.apiKey &&
+    !connection.token &&
+    !(connection.username && connection.password)
+  ) {
+    throw new Error("Revisium targets must include user:password, ?apikey=..., or ?token=...");
   }
 
   if (!isLocalUrl(connection.baseUrl) && !connection.apiKey && !connection.token && (!connection.username || !connection.password)) {
