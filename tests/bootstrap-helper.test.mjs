@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   connectionFromEnv,
+  ensureRows,
+  ensureTables,
   hydrateSchemaDefaults,
   parseConnectionTarget,
   parseRevisiumUrl,
@@ -129,6 +131,49 @@ test("hydrateSchemaDefaults fills computed defaults in nested arrays and objects
       items: [{ name: "one", position: 0 }],
     },
   );
+});
+
+test("ensureTables treats create conflicts as existing tables", async () => {
+  const calls = [];
+
+  await ensureTables(
+    {
+      async getTables() {
+        return { edges: [] };
+      },
+      async createTable(id) {
+        calls.push(id);
+        const error = new Error("Table already exists");
+        error.status = 409;
+        throw error;
+      },
+    },
+    [{ id: "FeatureFlag", schema: { type: "object", properties: {}, required: [] } }],
+  );
+
+  assert.deepEqual(calls, ["FeatureFlag"]);
+});
+
+test("ensureRows treats create conflicts as existing rows", async () => {
+  const calls = [];
+
+  await ensureRows(
+    {
+      async getRows() {
+        return { edges: [] };
+      },
+      async createRow(tableId, rowId) {
+        calls.push(`${tableId}/${rowId}`);
+        const error = new Error("Row conflict");
+        error.status = 409;
+        throw error;
+      },
+    },
+    [{ tableId: "FeatureFlag", rowId: "checkout-v2", data: {} }],
+    [{ id: "FeatureFlag", schema: { type: "object", properties: {}, required: [] } }],
+  );
+
+  assert.deepEqual(calls, ["FeatureFlag/checkout-v2"]);
 });
 
 function restoreEnv(previous) {

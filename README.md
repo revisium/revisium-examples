@@ -18,7 +18,7 @@ Revisium Standalone process on `http://localhost:9222`.
 
 ## Prerequisites
 
-Install Node.js 22 or newer. Node.js includes `npm` and `npx`.
+Install Node.js 22.13.0 or newer. Node.js includes `npm` and `npx`.
 
 Check your version:
 
@@ -156,7 +156,7 @@ flowchart TB
 | `nestjs-dictionary-service` | `dictionary` | `FaqCategory`, `FaqItem`, `Country`, `Currency` |
 | `nextjs-remote-config` | `web-config` | `FeatureFlag`, `PageCopy`, `Plan` |
 | `react-feature-flags` | `frontend-config` | `FeatureFlag`, `AudienceSegment`, `Asset` |
-| `mcp-knowledge-base` | `knowledge-base` | `facts`, `decisions`, `tasks`, `sessions` |
+| `mcp-knowledge-base` | `knowledge-base` | `facts`, `decisions`, `tasks`, `blockers`, `sessions` |
 
 ## Verify
 

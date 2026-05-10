@@ -17,7 +17,7 @@ copyable examples.
 
 ## Developer Flow
 
-1. Install Node.js 22+.
+1. Install Node.js 22.13.0+.
 2. Run `npx @revisium/standalone@latest`.
 3. Run one bootstrap command, for example `npm run bootstrap:react`.
 4. Open `http://localhost:9222` and inspect the project.

@@ -15,7 +15,7 @@ seed rows, and environment contract stay at this example root.
 
 ## Prerequisites
 
-- Node.js 22+
+- Node.js 22.13.0+
 - local Revisium Standalone on `http://localhost:9222`
 
 ## Run

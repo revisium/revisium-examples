@@ -69,7 +69,7 @@ async function ensureProject(client, connection) {
   }
 }
 
-async function ensureTables(draft, tables) {
+export async function ensureTables(draft, tables) {
   const existingTables = await draft.getTables({ first: 1000 });
   const existingTableIds = new Set(existingTables.edges.map(({ node }) => node.id));
 
@@ -79,13 +79,22 @@ async function ensureTables(draft, tables) {
       continue;
     }
 
-    await draft.createTable(table.id, table.schema);
+    try {
+      await draft.createTable(table.id, table.schema);
+      console.log(`created table: ${table.id}`);
+    } catch (error) {
+      if (!isAlreadyExistsError(error)) {
+        throw error;
+      }
+
+      console.log(`table exists: ${table.id}`);
+    }
+
     existingTableIds.add(table.id);
-    console.log(`created table: ${table.id}`);
   }
 }
 
-async function ensureRows(draft, rows, tables) {
+export async function ensureRows(draft, rows, tables) {
   const existingRowIdsByTable = new Map();
   const schemasByTable = new Map(tables.map((table) => [table.id, table.schema]));
 
@@ -97,9 +106,18 @@ async function ensureRows(draft, rows, tables) {
       continue;
     }
 
-    await draft.createRow(row.tableId, row.rowId, hydrateSchemaDefaults(schemasByTable.get(row.tableId), row.data));
+    try {
+      await draft.createRow(row.tableId, row.rowId, hydrateSchemaDefaults(schemasByTable.get(row.tableId), row.data));
+      console.log(`created row: ${row.tableId}/${row.rowId}`);
+    } catch (error) {
+      if (!isAlreadyExistsError(error)) {
+        throw error;
+      }
+
+      console.log(`row exists: ${row.tableId}/${row.rowId}`);
+    }
+
     existingRowIds.add(row.rowId);
-    console.log(`created row: ${row.tableId}/${row.rowId}`);
   }
 }
 

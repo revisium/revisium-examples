@@ -15,7 +15,7 @@ config and seed data stay at this example root.
 
 ## Prerequisites
 
-- Node.js 22+
+- Node.js 22.13.0+
 - local Revisium Standalone on `http://localhost:9222`
 
 ## Run
@@ -60,13 +60,14 @@ flowchart LR
 
 ## Revisium Tables
 
-Bootstrap creates project `knowledge-base` with these tables:
+Bootstrap creates project `knowledge-base` with tables such as:
 
 | Table | Purpose | Key fields |
 | --- | --- | --- |
 | `facts` | Stable knowledge with source and confidence | `topic`, `source`, `content`, `category`, `verified`, `confidence` |
 | `decisions` | ADR-style decisions with supporting fact links | `date`, `status`, `context`, `decision`, `supportingFacts` |
 | `tasks` | Work items linked to facts and decisions | `title`, `status`, `description`, `relatedFacts`, `relatedDecisions` |
+| `blockers` | Blocked work linked to tasks | `title`, `relatedTask`, `status` |
 | `attachments` | Evidence files linked from knowledge rows | `title`, `file` |
 | `modules` | Codebase architecture by bounded area | `title`, `path`, `content` |
 | `sessions` | Short work summaries connected to tasks and decisions | `date`, `summary`, `tasksStarted`, `tasksCompleted` |
@@ -75,7 +76,7 @@ Bootstrap creates project `knowledge-base` with these tables:
 
 | Capability | Covered by | Notes |
 | --- | --- | --- |
-| Tables | `facts`, `decisions`, `tasks`, `modules`, `sessions`, `attachments` | Knowledge, work, architecture, and evidence |
+| Tables | `facts`, `decisions`, `tasks`, `blockers`, `modules`, `sessions`, `attachments` | Knowledge, work, architecture, and evidence |
 | Scalar FK | `blockers.relatedTask` | Blocker points to task |
 | Nested FK | `sessions.context.primaryDecisionId` | Nested session context references decision |
 | Array primitive FK | `decisions.supportingFacts[]` | Fact links |

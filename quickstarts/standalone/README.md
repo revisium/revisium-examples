@@ -10,7 +10,7 @@ Run Revisium locally with one command and no external services.
 
 ## Prerequisites
 
-Install Node.js 22 or newer. Node.js includes `npm` and `npx`.
+Install Node.js 22.13.0 or newer. Node.js includes `npm` and `npx`.
 
 ```bash
 node --version
@@ -80,7 +80,7 @@ The app examples create these local projects:
 | `dictionary` | `FaqCategory`, `FaqItem`, `Country`, `Currency` |
 | `web-config` | `FeatureFlag`, `PageCopy`, `Plan` |
 | `frontend-config` | `FeatureFlag`, `AudienceSegment`, `Asset` |
-| `knowledge-base` | `facts`, `decisions`, `tasks`, `sessions` |
+| `knowledge-base` | `facts`, `decisions`, `tasks`, `blockers`, `sessions` |
 
 ## Create Data Manually
 
