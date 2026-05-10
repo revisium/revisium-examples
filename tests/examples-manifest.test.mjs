@@ -26,6 +26,7 @@ test("examples manifest points to complete example folders", () => {
   for (const example of manifest.examples) {
     assert.ok(example.id, "example id is required");
     assert.ok(allowedStatuses.has(example.status), `${example.id} uses unsupported status ${example.status}`);
+    assert.deepEqual(example.modes, ["standalone"], `${example.id} should only support standalone in this repo`);
     assert.ok(!ids.has(example.id), `duplicate example id: ${example.id}`);
     ids.add(example.id);
 
@@ -37,6 +38,7 @@ test("examples manifest points to complete example folders", () => {
     const metadata = JSON.parse(readFileSync(join(exampleDir, "example.json"), "utf8"));
     assert.equal(metadata.id, example.id, `${example.path}/example.json id should match examples.json`);
     assert.equal(metadata.path, example.path, `${example.path}/example.json path should match examples.json`);
+    assert.deepEqual(metadata.modes, ["standalone"], `${example.path}/example.json should only support standalone`);
   }
 });
 

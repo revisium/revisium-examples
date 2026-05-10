@@ -21,9 +21,9 @@ test("parseRevisiumUrl follows revisium-cli localhost protocol detection", () =>
   });
 });
 
-test("parseRevisiumUrl carries Cloud API key and revision from URL", () => {
-  assert.deepEqual(parseRevisiumUrl("revisium://cloud.revisium.io/my-org/dictionary/master:head?apikey=rev_xxx"), {
-    baseUrl: "https://cloud.revisium.io",
+test("parseRevisiumUrl carries remote API key and revision from URL", () => {
+  assert.deepEqual(parseRevisiumUrl("revisium://revisium.example.com/my-org/dictionary/master:head?apikey=rev_xxx"), {
+    baseUrl: "https://revisium.example.com",
     organizationId: "my-org",
     projectName: "dictionary",
     branchName: "master",

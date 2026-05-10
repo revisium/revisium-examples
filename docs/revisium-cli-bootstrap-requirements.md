@@ -1,13 +1,13 @@
 # Revisium CLI Bootstrap Requirements
 
-The examples should bootstrap through `revisium-cli` and a small shared script. Today
-the examples are optimized for local writable Revisium and then optional Cloud verification.
+The examples should eventually bootstrap through `revisium-cli`. Until the CLI
+has all required commands, examples use a small shared script built on
+`@revisium/client`.
 
 Examples use the same target format as `revisium-cli`:
 
 ```bash
 export REVISIUM_URL="revisium://admin:admin@localhost:9222/admin/dictionary/master"
-export REVISIUM_URL="revisium://cloud.revisium.io/my-org/dictionary/master?apikey=rev_xxx"
 ```
 
 ## Current Supported Pieces
@@ -30,7 +30,7 @@ export REVISIUM_URL="revisium://cloud.revisium.io/my-org/dictionary/master?apike
 
 ## Interim Script
 
-Until those CLI commands exist, application examples use `@revisium/client`:
+Application examples currently use `@revisium/client`:
 
 ```bash
 npm install
@@ -45,7 +45,9 @@ Each app has:
 
 Recommended local bootstrap flow for all apps:
 
-- Set `.env` with `REVISIUM_URL` (prefer `localhost` while composing).
-- Start Revisium locally with `npx @revisium/standalone@latest` (or Docker Compose equivalent).
-- Run `npm run bootstrap:<example-script>`.
-- Use `@revisium/client` read/write APIs via the same URL format.
+1. Install Node.js 22+.
+2. Start Revisium locally with `npx @revisium/standalone@latest`.
+3. Copy the example `.env.example` to `.env` if you need to override defaults.
+4. Run `npm run bootstrap:<example-script>`.
+5. Inspect and edit data in `http://localhost:9222`.
+6. Stop standalone with `Ctrl+C`.

@@ -319,8 +319,8 @@
         "relatedFlagIds": [],
         "ctas": [
           {
-            "label": "Try Cloud",
-            "href": "https://cloud.revisium.io",
+            "label": "Read docs",
+            "href": "https://docs.revisium.io/quick-start",
             "flagId": "pricing-banner"
           }
         ]
