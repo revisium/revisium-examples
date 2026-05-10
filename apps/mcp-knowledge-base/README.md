@@ -44,7 +44,7 @@ claude mcp add revisium-kb --env REVISIUM_URL="$(grep '^REVISIUM_URL=' .env | cu
 - MCP local endpoint: `http://localhost:9222/mcp`
 - MCP Cloud endpoint: `https://cloud.revisium.io/mcp` (optional read-only inspection)
 - REST visibility check:
-  `http://localhost:9222/endpoint/rest/admin/knowledge-base/master/head/facts`
+  `POST http://localhost:9222/endpoint/rest/admin/knowledge-base/master/head/tables/facts/rows`
 
 Use local instances for all content edits; promote to Cloud only after review and
 snapshot export.
@@ -144,7 +144,7 @@ revisium://[user:password@]host[:port]/organization/project/branch[:revision][?t
 ```
 
 ```env
-REVISIUM_URL=revisium://your-username:your-password@localhost:9222/admin/knowledge-base/master
+REVISIUM_URL=revisium://admin:admin@localhost:9222/admin/knowledge-base/master
 REVISIUM_MCP_URL=http://localhost:9222/mcp
 ```
 

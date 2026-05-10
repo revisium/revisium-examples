@@ -102,7 +102,7 @@ This domain should show Revisium as a reference-data service with relations, str
 | Computed nested | `FaqItem.summary.wordCount` | Derived from nested summary/body fields |
 | Computed array index | `FaqItem.primaryTag` | Reads first tag |
 | Computed aggregate | `FaqCategory.weightTotal` | Sums category weights |
-| Generated API | `GET /FaqItem` through generated REST or GraphQL | NestJS typed client |
+| Generated API | `POST /tables/FaqItem/rows` through generated REST or GraphQL | NestJS typed client |
 | MCP | `get_tables`, `search_rows` on `dictionary/master:head` | Agent can inspect and update reference data |
 
 ## Environment
@@ -114,7 +114,7 @@ revisium://[user:password@]host[:port]/organization/project/branch[:revision][?t
 ```
 
 ```env
-REVISIUM_URL=revisium://your-username:your-password@localhost:9222/admin/dictionary/master
+REVISIUM_URL=revisium://admin:admin@localhost:9222/admin/dictionary/master
 ```
 
 Cloud mode keeps the same shape and carries the API key in the URL. Read/write should be done via local revisium unless you specifically deploy writable Cloud access:
@@ -177,7 +177,7 @@ In a real NestJS app, put this behind a small `DictionaryService` and keep URL p
 | 5 | `cd apps/nestjs-dictionary-service/project && npm install` | Install app dependencies |
 | 6 | `npm run build && npm run start` | Run the NestJS app |
 | 7 | `curl -fsS http://localhost:3000/faq` | Smoke test app output |
-| 8 | `curl -fsS http://localhost:9222/endpoint/rest/admin/dictionary/master/head/FaqItem` | Confirm schema data in Revisium |
+| 8 | `curl -fsS -X POST http://localhost:9222/endpoint/rest/admin/dictionary/master/head/tables/FaqItem/rows -H 'content-type: application/json' -d '{"first":10}'` | Confirm schema data in Revisium |
 
 ```bash
 cp apps/nestjs-dictionary-service/.env.example apps/nestjs-dictionary-service/.env
@@ -196,7 +196,9 @@ npm run start
 ## Verify
 
 ```bash
-curl -fsS http://localhost:9222/endpoint/rest/admin/dictionary/master/head/FaqItem
+curl -fsS -X POST http://localhost:9222/endpoint/rest/admin/dictionary/master/head/tables/FaqItem/rows \
+  -H 'content-type: application/json' \
+  -d '{"first":10}'
 ```
 
 Expected result: list of FAQ rows read from Revisium. The separate NestJS project should expose its own app-level route around the same `@revisium/client` call.

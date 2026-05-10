@@ -1,27 +1,54 @@
 {
-  "defaultUrl": "revisium://localhost:9222/admin/web-config/master",
+  "defaultUrl": "revisium://admin:admin@localhost:9222/admin/web-config/master",
   "organizationId": "admin",
   "projectName": "web-config",
   "branchName": "master",
   "commitMessage": "Bootstrap Next.js remote config example",
-  "endpoints": ["REST_API", "GRAPHQL"],
+  "endpoints": [
+    "REST_API",
+    "GRAPHQL"
+  ],
   "tables": [
     {
       "id": "FeatureFlag",
       "schema": {
         "type": "object",
         "properties": {
-          "enabled": { "type": "boolean", "default": false },
-          "rollout": { "type": "number", "default": 0 },
-          "description": { "type": "string", "default": "" },
-          "segments": { "type": "array", "items": { "type": "string", "default": "" } },
+          "enabled": {
+            "type": "boolean",
+            "default": false
+          },
+          "rollout": {
+            "type": "number",
+            "default": 0
+          },
+          "description": {
+            "type": "string",
+            "default": ""
+          },
+          "segments": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "default": ""
+            }
+          },
           "isFullyRolledOut": {
             "type": "boolean",
             "readOnly": true,
-            "x-formula": { "version": 1, "expression": "enabled && rollout >= 100" }
+            "x-formula": {
+              "version": 1,
+              "expression": "enabled && rollout >= 100"
+            },
+            "default": false
           }
         },
-        "required": ["enabled", "rollout", "description", "segments"],
+        "required": [
+          "enabled",
+          "rollout",
+          "description",
+          "segments"
+        ],
         "additionalProperties": false
       }
     },
@@ -30,10 +57,17 @@
       "schema": {
         "type": "object",
         "properties": {
-          "title": { "type": "string", "default": "" },
-          "file": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" }
+          "title": {
+            "type": "string",
+            "default": ""
+          },
+          "file": {
+            "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0"
+          }
         },
-        "required": ["title"],
+        "required": [
+          "title"
+        ],
         "additionalProperties": false
       }
     },
@@ -42,53 +76,103 @@
       "schema": {
         "type": "object",
         "properties": {
-          "title": { "type": "string", "default": "" },
-          "body": { "type": "string", "default": "", "contentMediaType": "text/markdown" },
-          "heroAssetId": { "type": "string", "default": "", "foreignKey": "Asset" },
-          "relatedPageIds": {
+          "title": {
+            "type": "string",
+            "default": ""
+          },
+          "body": {
+            "type": "string",
+            "default": "",
+            "contentMediaType": "text/markdown"
+          },
+          "heroAssetId": {
+            "type": "string",
+            "default": "",
+            "foreignKey": "Asset"
+          },
+          "relatedFlagIds": {
             "type": "array",
-            "items": { "type": "string", "default": "", "foreignKey": "PageCopy" }
+            "items": {
+              "type": "string",
+              "default": "",
+              "foreignKey": "FeatureFlag"
+            }
           },
           "ctas": {
             "type": "array",
             "items": {
               "type": "object",
               "properties": {
-                "label": { "type": "string", "default": "" },
-                "href": { "type": "string", "default": "" },
-                "flagId": { "type": "string", "default": "", "foreignKey": "FeatureFlag" }
+                "label": {
+                  "type": "string",
+                  "default": ""
+                },
+                "href": {
+                  "type": "string",
+                  "default": ""
+                },
+                "flagId": {
+                  "type": "string",
+                  "default": "",
+                  "foreignKey": "FeatureFlag"
+                }
               },
-              "required": ["label", "href", "flagId"],
+              "required": [
+                "label",
+                "href",
+                "flagId"
+              ],
               "additionalProperties": false
             }
           },
           "media": {
             "type": "object",
             "properties": {
-              "heroImage": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" },
+              "heroImage": {
+                "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0"
+              },
               "gallery": {
                 "type": "array",
-                "items": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" }
+                "items": {
+                  "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0"
+                }
               }
             },
-            "additionalProperties": false
+            "additionalProperties": false,
+            "required": []
           },
           "attachments": {
             "type": "array",
-            "items": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" }
+            "items": {
+              "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0"
+            }
           },
           "primaryCtaLabel": {
             "type": "string",
             "readOnly": true,
-            "x-formula": { "version": 1, "expression": "ctas[0].label" }
+            "x-formula": {
+              "version": 1,
+              "expression": "ctas[0].label"
+            },
+            "default": ""
           },
           "ctaCount": {
             "type": "number",
             "readOnly": true,
-            "x-formula": { "version": 1, "expression": "count(ctas)" }
+            "x-formula": {
+              "version": 1,
+              "expression": "count(ctas)"
+            },
+            "default": 0
           }
         },
-        "required": ["title", "body", "heroAssetId", "relatedPageIds", "ctas"],
+        "required": [
+          "title",
+          "body",
+          "heroAssetId",
+          "relatedFlagIds",
+          "ctas"
+        ],
         "additionalProperties": false
       }
     },
@@ -97,58 +181,109 @@
       "schema": {
         "type": "object",
         "properties": {
-          "name": { "type": "string", "default": "" },
-          "monthlyPrice": { "type": "number", "default": 0 },
+          "name": {
+            "type": "string",
+            "default": ""
+          },
+          "monthlyPrice": {
+            "type": "number",
+            "default": 0
+          },
           "metadata": {
             "type": "object",
             "properties": {
-              "featuredFlagId": { "type": "string", "default": "", "foreignKey": "FeatureFlag" }
+              "featuredFlagId": {
+                "type": "string",
+                "default": "",
+                "foreignKey": "FeatureFlag"
+              }
             },
-            "required": ["featuredFlagId"],
+            "required": [
+              "featuredFlagId"
+            ],
             "additionalProperties": false
           },
           "display": {
             "type": "object",
             "properties": {
-              "tone": { "type": "string", "default": "" },
+              "tone": {
+                "type": "string",
+                "default": ""
+              },
               "badge": {
                 "type": "string",
                 "readOnly": true,
-                "x-formula": { "version": 1, "expression": "/name + \" plan\"" }
+                "x-formula": {
+                  "version": 1,
+                  "expression": "/name + \" plan\""
+                },
+                "default": ""
               }
             },
-            "additionalProperties": false
+            "additionalProperties": false,
+            "required": []
           },
           "features": {
             "type": "array",
             "items": {
               "type": "object",
               "properties": {
-                "name": { "type": "string", "default": "" },
-                "weight": { "type": "number", "default": 0 },
-                "flagId": { "type": "string", "default": "", "foreignKey": "FeatureFlag" }
+                "name": {
+                  "type": "string",
+                  "default": ""
+                },
+                "weight": {
+                  "type": "number",
+                  "default": 0
+                },
+                "flagId": {
+                  "type": "string",
+                  "default": "",
+                  "foreignKey": "FeatureFlag"
+                }
               },
-              "required": ["name", "weight", "flagId"],
+              "required": [
+                "name",
+                "weight",
+                "flagId"
+              ],
               "additionalProperties": false
             }
           },
           "annualPrice": {
             "type": "number",
             "readOnly": true,
-            "x-formula": { "version": 1, "expression": "monthlyPrice * 12" }
+            "x-formula": {
+              "version": 1,
+              "expression": "monthlyPrice * 12"
+            },
+            "default": 0
           },
           "featureCount": {
             "type": "number",
             "readOnly": true,
-            "x-formula": { "version": 1, "expression": "count(features)" }
+            "x-formula": {
+              "version": 1,
+              "expression": "count(features)"
+            },
+            "default": 0
           },
           "featureWeightTotal": {
             "type": "number",
             "readOnly": true,
-            "x-formula": { "version": 1, "expression": "sum(features[*].weight)" }
+            "x-formula": {
+              "version": 1,
+              "expression": "sum(features[*].weight)"
+            },
+            "default": 0
           }
         },
-        "required": ["name", "monthlyPrice", "metadata", "features"],
+        "required": [
+          "name",
+          "monthlyPrice",
+          "metadata",
+          "features"
+        ],
         "additionalProperties": false
       }
     }
@@ -157,12 +292,22 @@
     {
       "tableId": "FeatureFlag",
       "rowId": "pricing-banner",
-      "data": { "enabled": true, "rollout": 100, "description": "Show pricing banner", "segments": ["public", "trial"] }
+      "data": {
+        "enabled": true,
+        "rollout": 100,
+        "description": "Show pricing banner",
+        "segments": [
+          "public",
+          "trial"
+        ]
+      }
     },
     {
       "tableId": "Asset",
       "rowId": "hero",
-      "data": { "title": "Homepage hero" }
+      "data": {
+        "title": "Homepage hero"
+      }
     },
     {
       "tableId": "PageCopy",
@@ -171,8 +316,14 @@
         "title": "Structured content with versioning",
         "body": "Edit content in Revisium and read it from Next.js.",
         "heroAssetId": "hero",
-        "relatedPageIds": [],
-        "ctas": [{ "label": "Try Cloud", "href": "https://cloud.revisium.io", "flagId": "pricing-banner" }]
+        "relatedFlagIds": [],
+        "ctas": [
+          {
+            "label": "Try Cloud",
+            "href": "https://cloud.revisium.io",
+            "flagId": "pricing-banner"
+          }
+        ]
       }
     },
     {
@@ -181,8 +332,16 @@
       "data": {
         "name": "Team",
         "monthlyPrice": 29,
-        "metadata": { "featuredFlagId": "pricing-banner" },
-        "features": [{ "name": "Versioned config", "weight": 10, "flagId": "pricing-banner" }]
+        "metadata": {
+          "featuredFlagId": "pricing-banner"
+        },
+        "features": [
+          {
+            "name": "Versioned config",
+            "weight": 10,
+            "flagId": "pricing-banner"
+          }
+        ]
       }
     }
   ]

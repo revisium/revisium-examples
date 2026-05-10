@@ -7,7 +7,11 @@ export async function loadFlags(): Promise<FeatureFlag[]> {
     throw new Error("VITE_REVISIUM_PUBLIC_FEATURE_FLAG_TABLE_URL is required.");
   }
 
-  const response = await fetch(endpoint);
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ first: 100 }),
+  });
 
   if (!response.ok) {
     throw new Error(`Failed to load flags: ${response.status}`);

@@ -67,7 +67,7 @@ This domain should show website content and runtime settings that can change wit
 | Tables | `FeatureFlag`, `PageCopy`, `Plan`, `Asset` | Config, CMS copy, pricing, and media |
 | Scalar FK | `PageCopy.heroAssetId` | Page copy references an asset row |
 | Nested FK | `Plan.metadata.featuredFlagId` | Nested config references rollout flag |
-| Array primitive FK | `PageCopy.relatedPageIds[]` | Related copy rows |
+| Array primitive FK | `PageCopy.relatedFlagIds[]` | Related feature flags |
 | Array object FK | `Plan.features[].flagId` | Feature list can link to controlling flag |
 | Array primitives | `FeatureFlag.segments[]` | Audience segments |
 | Array objects | `Plan.features[]` | Pricing feature rows |
@@ -91,7 +91,7 @@ revisium://[user:password@]host[:port]/organization/project/branch[:revision][?t
 ```
 
 ```env
-REVISIUM_URL=revisium://your-username:your-password@localhost:9222/admin/web-config/master
+REVISIUM_URL=revisium://admin:admin@localhost:9222/admin/web-config/master
 ```
 
 Use generated `draft` endpoints for preview reads and generated `head` endpoints for production reads.
@@ -143,7 +143,7 @@ Mutations should be done in standalone/docker-compose. Use Cloud for read/previe
 | 5 | `cd apps/nextjs-remote-config/project && npm install` | Install app dependencies |
 | 6 | `npm run dev` | Starts Next.js on port `3000` |
 | 7 | `curl -fsS http://localhost:3000/api/config` | Verify generated config response |
-| 8 | `curl -fsS http://localhost:9222/endpoint/rest/admin/web-config/master/head/FeatureFlag` | Verify local seeded rows |
+| 8 | `curl -fsS -X POST http://localhost:9222/endpoint/rest/admin/web-config/master/head/tables/FeatureFlag/rows -H 'content-type: application/json' -d '{"first":10}'` | Verify local seeded rows |
 
 ```bash
 cp apps/nextjs-remote-config/.env.example apps/nextjs-remote-config/.env

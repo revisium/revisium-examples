@@ -34,7 +34,7 @@ Open the Vite URL printed in the terminal.
 ## Environment
 
 ```env
-VITE_REVISIUM_PUBLIC_FEATURE_FLAG_TABLE_URL=http://localhost:9222/endpoint/rest/admin/frontend-config/master/head/FeatureFlag
+VITE_REVISIUM_PUBLIC_FEATURE_FLAG_TABLE_URL=http://localhost:9222/endpoint/rest/admin/frontend-config/master/head/tables/FeatureFlag/rows
 ```
 
 For Docker Compose, use port `8080`. For Cloud, use the generated endpoint under `https://cloud.revisium.io/endpoint/rest/...`.

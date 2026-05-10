@@ -87,15 +87,15 @@ revisium://[user:password@]host[:port]/organization/project/branch[:revision][?t
 ```
 
 ```env
-REVISIUM_URL=revisium://your-username:your-password@localhost:9222/admin/frontend-config/master
-VITE_REVISIUM_PUBLIC_FEATURE_FLAG_TABLE_URL=http://localhost:9222/endpoint/rest/admin/frontend-config/master/head/FeatureFlag
+REVISIUM_URL=revisium://admin:admin@localhost:9222/admin/frontend-config/master
+VITE_REVISIUM_PUBLIC_FEATURE_FLAG_TABLE_URL=http://localhost:9222/endpoint/rest/admin/frontend-config/master/head/tables/FeatureFlag/rows
 ```
 
 Cloud mode keeps bootstrap credentials in the Revisium URL and points the browser at the public generated endpoint:
 
 ```env
 REVISIUM_URL=revisium://cloud.revisium.io/my-org/frontend-config/master?apikey=rev_xxx
-VITE_REVISIUM_PUBLIC_FEATURE_FLAG_TABLE_URL=https://cloud.revisium.io/endpoint/rest/my-org/frontend-config/master/head/FeatureFlag
+VITE_REVISIUM_PUBLIC_FEATURE_FLAG_TABLE_URL=https://cloud.revisium.io/endpoint/rest/my-org/frontend-config/master/head/tables/FeatureFlag/rows
 ```
 
 ## React Shape
@@ -115,7 +115,7 @@ The `FlagsProvider` should load flags once on app start, then refresh on a short
 
 - Admin UI: `http://localhost:9222`
 - Public feature endpoint:
-  `http://localhost:9222/endpoint/rest/admin/frontend-config/master/head/FeatureFlag`
+  `http://localhost:9222/endpoint/rest/admin/frontend-config/master/head/tables/FeatureFlag/rows`
 - MCP (optional): `http://localhost:9222/mcp`
 
 Use local revisium instances for schema and content edits. Use Cloud only for demo readers.
@@ -131,7 +131,7 @@ Use local revisium instances for schema and content edits. Use Cloud only for de
 | 5 | `cd apps/react-feature-flags/project && npm install` | Install app dependencies |
 | 6 | `npm run dev` | Starts the React app |
 | 7 | `curl -fsS http://localhost:3000` | Smoke test app UI loads |
-| 8 | `curl -fsS http://localhost:9222/endpoint/rest/admin/frontend-config/master/head/FeatureFlag` | Confirm row payload for local checks |
+| 8 | `curl -fsS -X POST http://localhost:9222/endpoint/rest/admin/frontend-config/master/head/tables/FeatureFlag/rows -H 'content-type: application/json' -d '{"first":10}'` | Confirm row payload for local checks |
 
 ```bash
 cp apps/react-feature-flags/.env.example apps/react-feature-flags/.env

@@ -6,7 +6,7 @@ the examples are optimized for local writable Revisium and then optional Cloud v
 Examples use the same target format as `revisium-cli`:
 
 ```bash
-export REVISIUM_URL="revisium://your-username:your-password@localhost:9222/admin/dictionary/master"
+export REVISIUM_URL="revisium://admin:admin@localhost:9222/admin/dictionary/master"
 export REVISIUM_URL="revisium://cloud.revisium.io/my-org/dictionary/master?apikey=rev_xxx"
 ```
 
