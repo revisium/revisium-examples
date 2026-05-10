@@ -281,19 +281,28 @@ for (const [index, example] of examples.entries()) {
     const bootstrapConfigPath = join(exampleDir, "bootstrap.config.json");
     if (existsSync(bootstrapConfigPath) && isJsonObject(cliConfig?.contexts)) {
       const bootstrapConfig = readJson(bootstrapConfigPath);
-      const expectedContext = readBootstrapScriptContext(example, exampleDir);
-      const context = expectedContext ? cliConfig.contexts[expectedContext] : undefined;
-      if (!context) {
-        errors.push(`${example.path} bootstrap script should call runCliBootstrap with a configured CLI context`);
-      } else if (context.instance !== "local" || context.organization !== "admin" || context.project !== bootstrapConfig.projectName || context.branch !== bootstrapConfig.branchName || context.revision !== "draft") {
-        errors.push(`${example.path} CLI context ${expectedContext} does not match bootstrap.config.json`);
+      if (!isJsonObject(bootstrapConfig)) {
+        errors.push(`${example.path}/bootstrap.config.json must be a JSON object`);
+        continue;
       }
 
-      const headContext = expectedContext ? cliConfig.contexts[`${expectedContext}-head`] : undefined;
-      if (!headContext) {
-        errors.push(`${example.path} is missing CLI head context ${expectedContext}-head`);
-      } else if (headContext.instance !== "local" || headContext.organization !== "admin" || headContext.project !== bootstrapConfig.projectName || headContext.branch !== bootstrapConfig.branchName || headContext.revision !== "head") {
-        errors.push(`${example.path} CLI head context ${expectedContext}-head does not match bootstrap.config.json`);
+      const expectedContext = readBootstrapScriptContext(example, exampleDir);
+      if (!expectedContext) {
+        errors.push(`${example.path} bootstrap script should call runCliBootstrap with a configured CLI context`);
+      } else {
+        const context = cliConfig.contexts[expectedContext];
+        if (!context) {
+          errors.push(`${example.path} bootstrap script should call runCliBootstrap with a configured CLI context`);
+        } else if (context.instance !== "local" || context.organization !== "admin" || context.project !== bootstrapConfig.projectName || context.branch !== bootstrapConfig.branchName || context.revision !== "draft") {
+          errors.push(`${example.path} CLI context ${expectedContext} does not match bootstrap.config.json`);
+        }
+
+        const headContext = cliConfig.contexts[`${expectedContext}-head`];
+        if (!headContext) {
+          errors.push(`${example.path} is missing CLI head context ${expectedContext}-head`);
+        } else if (headContext.instance !== "local" || headContext.organization !== "admin" || headContext.project !== bootstrapConfig.projectName || headContext.branch !== bootstrapConfig.branchName || headContext.revision !== "head") {
+          errors.push(`${example.path} CLI head context ${expectedContext}-head does not match bootstrap.config.json`);
+        }
       }
     }
   }

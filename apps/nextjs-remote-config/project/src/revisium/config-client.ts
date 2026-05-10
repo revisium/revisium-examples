@@ -48,6 +48,8 @@ async function connect(target: RevisiumTarget): Promise<RevisionScope> {
     client.loginWithToken(target.token);
   } else if (target.username && target.password) {
     await client.login(target.username, target.password);
+  } else if (target.username || target.password) {
+    throw new Error("REVISIUM_URL must include both username and password for basic auth.");
   }
 
   return client.revision({
