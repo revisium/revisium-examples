@@ -18,17 +18,20 @@ function loadEnvFile(envPath) {
   process.loadEnvFile(envPath);
 }
 
-function connectionFromEnv(config) {
+export function connectionFromEnv(config) {
   const parsedUrl = parseConnectionTarget(process.env.REVISIUM_URL ?? config.defaultUrl ?? "");
+  const baseUrl = parsedUrl.baseUrl;
+  const defaultLocalUsername = isLocalUrl(baseUrl) ? "admin" : "";
+  const defaultLocalPassword = isLocalUrl(baseUrl) ? "admin" : "";
 
   return {
-    baseUrl: parsedUrl.baseUrl,
+    baseUrl,
     organizationId: parsedUrl.organizationId ?? config.organizationId ?? "admin",
     projectName: parsedUrl.projectName ?? config.projectName,
     branchName: parsedUrl.branchName ?? config.branchName ?? "master",
     revisionName: parsedUrl.revisionName ?? config.revisionName ?? "draft",
-    username: parsedUrl.username ?? process.env.REVISIUM_USERNAME ?? config.username ?? "",
-    password: parsedUrl.password ?? process.env.REVISIUM_PASSWORD ?? config.password ?? "",
+    username: parsedUrl.username ?? process.env.REVISIUM_USERNAME ?? config.username ?? defaultLocalUsername,
+    password: parsedUrl.password ?? process.env.REVISIUM_PASSWORD ?? config.password ?? defaultLocalPassword,
     token: parsedUrl.token ?? process.env.REVISIUM_TOKEN ?? "",
     apiKey: parsedUrl.apiKey ?? process.env.REVISIUM_API_KEY ?? "",
   };
@@ -66,36 +69,102 @@ async function ensureProject(client, connection) {
   }
 }
 
-async function ensureTables(draft, tables) {
+export async function ensureTables(draft, tables) {
+  const existingTables = await draft.getTables({ first: 1000 });
+  const existingTableIds = new Set(existingTables.edges.map(({ node }) => node.id));
+
   for (const table of tables) {
-    try {
-      await draft.getTable(table.id);
+    if (existingTableIds.has(table.id)) {
       console.log(`table exists: ${table.id}`);
+      continue;
+    }
+
+    try {
+      await draft.createTable(table.id, table.schema);
+      console.log(`created table: ${table.id}`);
     } catch (error) {
-      if (!isNotFoundError(error)) {
+      if (!isAlreadyExistsError(error)) {
         throw error;
       }
 
-      await draft.createTable(table.id, table.schema);
-      console.log(`created table: ${table.id}`);
+      console.log(`table exists: ${table.id}`);
     }
+
+    existingTableIds.add(table.id);
   }
 }
 
-async function ensureRows(draft, rows) {
+export async function ensureRows(draft, rows, tables) {
+  const existingRowIdsByTable = new Map();
+  const schemasByTable = new Map(tables.map((table) => [table.id, table.schema]));
+
   for (const row of rows) {
-    try {
-      await draft.getRow(row.tableId, row.rowId);
+    const existingRowIds = await getExistingRowIds(draft, existingRowIdsByTable, row.tableId);
+
+    if (existingRowIds.has(row.rowId)) {
       console.log(`row exists: ${row.tableId}/${row.rowId}`);
+      continue;
+    }
+
+    try {
+      await draft.createRow(row.tableId, row.rowId, hydrateSchemaDefaults(schemasByTable.get(row.tableId), row.data));
+      console.log(`created row: ${row.tableId}/${row.rowId}`);
     } catch (error) {
-      if (!isNotFoundError(error)) {
+      if (!isAlreadyExistsError(error)) {
         throw error;
       }
 
-      await draft.createRow(row.tableId, row.rowId, row.data);
-      console.log(`created row: ${row.tableId}/${row.rowId}`);
+      console.log(`row exists: ${row.tableId}/${row.rowId}`);
     }
+
+    existingRowIds.add(row.rowId);
   }
+}
+
+async function getExistingRowIds(draft, cache, tableId) {
+  if (!cache.has(tableId)) {
+    const existingRows = await draft.getRows(tableId, { first: 1000 });
+    cache.set(tableId, new Set(existingRows.edges.map(({ node }) => node.id)));
+  }
+
+  return cache.get(tableId);
+}
+
+export function hydrateSchemaDefaults(schema, data) {
+  if (!schema || typeof schema !== "object") {
+    return data;
+  }
+
+  if (schema.type === "object" && schema.properties) {
+    const result = data && typeof data === "object" && !Array.isArray(data) ? { ...data } : {};
+
+    for (const [propertyName, propertySchema] of Object.entries(schema.properties)) {
+      if (Object.hasOwn(result, propertyName)) {
+        result[propertyName] = hydrateSchemaDefaults(propertySchema, result[propertyName]);
+        continue;
+      }
+
+      if (Object.hasOwn(propertySchema, "default")) {
+        result[propertyName] = cloneDefault(propertySchema.default);
+      }
+    }
+
+    return result;
+  }
+
+  if (schema.type === "array" && Array.isArray(data)) {
+    return data.map((item) => hydrateSchemaDefaults(schema.items, item));
+  }
+
+  return data;
+}
+
+function cloneDefault(value) {
+  if (value === null || typeof value !== "object") {
+    return value;
+  }
+
+  return JSON.parse(JSON.stringify(value));
 }
 
 async function ensureEndpoints(draft, endpointTypes) {
@@ -144,9 +213,9 @@ export async function bootstrapExample(configPath) {
   const draft = branch.draft();
 
   await ensureTables(draft, config.tables ?? []);
-  await ensureRows(draft, config.rows ?? []);
-  await ensureEndpoints(draft, config.endpoints ?? ["REST_API", "GRAPHQL"]);
+  await ensureRows(draft, config.rows ?? [], config.tables ?? []);
   await commitIfNeeded(draft, config.commitMessage ?? `Bootstrap ${connection.projectName} example`);
+  await ensureEndpoints(branch.head(), config.endpoints ?? ["REST_API", "GRAPHQL"]);
 
   console.log(`ready: ${connection.organizationId}/${connection.projectName}/${connection.branchName}:head`);
 }
@@ -321,11 +390,4 @@ function isAlreadyExistsError(error) {
   const message = String(error.message ?? "");
 
   return status === 409 || /already exists|conflict/i.test(message);
-}
-
-function isNotFoundError(error) {
-  const status = error.status ?? error.statusCode ?? error.response?.status;
-  const message = String(error.message ?? "");
-
-  return status === 404 || /not found/i.test(message);
 }

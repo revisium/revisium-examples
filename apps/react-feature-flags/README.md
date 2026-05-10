@@ -2,51 +2,73 @@
 
 Read client-facing feature flags from Revisium without redeploying a React app.
 
-The runnable app lives in [`project/`](./project/README.md). Use local writable Revisium
-for bootstrap and flag authoring, then point production-facing apps at Cloud if needed.
+The runnable app lives in [`project/`](./project/README.md). Bootstrap config,
+seed rows, and environment contract stay at this example root.
 
 ## What This Shows
 
 - Revisium as a lightweight remote configuration service
-- public generated endpoint for safe client-readable config
-- private draft workflow before flags become production-visible
-- the same schema usable from standalone, Docker, or Cloud
+- public generated endpoint for client-readable config
+- private draft workflow before flags become visible at `head`
+- no write-capable credentials in browser code
 
-## Supported Modes
+## Prerequisites
 
-| Mode | URL | Notes |
-| --- | --- | --- |
-| Standalone | `http://localhost:9222` | Local development (mutable) |
-| Docker Compose | `http://localhost:8080` | Local service parity (standalone + PostgreSQL) |
-| Revisium Cloud | `https://cloud.revisium.io` | Managed flag source |
+- Node.js 22.13.0+
+- local Revisium Standalone on `http://localhost:9222`
+
+## Run
+
+Terminal 1:
+
+```bash
+npx @revisium/standalone@latest
+```
+
+Terminal 2:
+
+```bash
+npm install
+cp apps/react-feature-flags/.env.example apps/react-feature-flags/.env
+npm run bootstrap:react
+cd apps/react-feature-flags/project
+cp .env.example .env
+npm install
+npm run dev
+```
+
+Open the Vite URL printed in the terminal.
+
+Stop standalone from terminal 1 with `Ctrl+C`.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-  Browser[React app in browser] --> FlagsProvider[FlagsProvider]
-  FlagsProvider --> PublicEndpoint[Public generated head endpoint]
-  PublicEndpoint --> Revisium[Revisium]
+  Browser[React app] --> Provider[FlagsProvider]
+  Provider --> Endpoint[Public generated endpoint]
+  Endpoint --> Revisium[Revisium Standalone :9222]
+  Editor[Admin UI] --> Revisium
   Revisium --> FeatureFlag[(FeatureFlag table)]
-  Editor[Product manager] --> Admin[Admin UI]
-  Admin --> Revisium
 ```
 
 ## Revisium Tables
 
-Create project `frontend-config` with table `FeatureFlag`.
+Bootstrap creates project `frontend-config` with these tables:
 
-Recommended row IDs:
+| Table | Purpose |
+| --- | --- |
+| `FeatureFlag` | Flag definitions, rollout rules, and UI metadata |
+| `AudienceSegment` | Reusable rollout audiences |
+| `Asset` | Public assets used by flag-driven UI |
+
+Recommended flag row IDs:
 
 - `new-navigation`
 - `beta-search`
 - `checkout-v2`
 
-The full `FeatureFlag` schema is defined in [`bootstrap.config.json`](./bootstrap.config.json). It includes base flag fields plus targeting, rules, media, arrays, and computed fields used by the capability matrix below.
-
 ## Capability Coverage
-
-This domain should show the minimum flag system plus richer structures that prove Revisium can model real frontend rollout rules.
 
 | Capability | Covered by | Notes |
 | --- | --- | --- |
@@ -64,91 +86,41 @@ This domain should show the minimum flag system plus richer structures that prov
 | Computed scalar | `FeatureFlag.isFullyRolledOut` | Derived from `enabled` and `rollout` |
 | Computed nested | `FeatureFlag.targeting.summary` | Derived from nested targeting fields |
 | Computed array index | `FeatureFlag.primaryEnvironment` | Reads first environment |
-| Computed aggregate | `FeatureFlag.totalRuleWeight` | Sums rollout weights in rules where supported |
+| Computed aggregate | `FeatureFlag.totalRuleWeight` | Sums rollout weights in rules |
 | Generated API | Public `head` endpoint read by browser | No write credentials in frontend |
 | MCP | `get_tables`, `search_rows` on `frontend-config/master:head` | Agent can audit flags |
 
-## Runtime Pattern
-
-Do not expose write-capable credentials in the browser.
-
-Preferred options:
-
-1. Public generated `head` endpoint for non-sensitive flags.
-2. Your backend proxies private flags and filters what the browser can see.
-3. Static build step snapshots public flags into frontend assets.
-
 ## Environment
 
-Use the same Revisium URL format as `revisium-cli`:
-
-```text
-revisium://[user:password@]host[:port]/organization/project/branch[:revision][?token=...|apikey=...]
-```
+Bootstrap writes to draft:
 
 ```env
-REVISIUM_URL=revisium://your-username:your-password@localhost:9222/admin/frontend-config/master
-VITE_REVISIUM_PUBLIC_FEATURE_FLAG_TABLE_URL=http://localhost:9222/endpoint/rest/admin/frontend-config/master/head/FeatureFlag
+REVISIUM_URL=revisium://admin:admin@localhost:9222/admin/frontend-config/master
 ```
 
-Cloud mode keeps bootstrap credentials in the Revisium URL and points the browser at the public generated endpoint:
+The browser app reads the generated public endpoint:
 
 ```env
-REVISIUM_URL=revisium://cloud.revisium.io/my-org/frontend-config/master?apikey=rev_xxx
-VITE_REVISIUM_PUBLIC_FEATURE_FLAG_TABLE_URL=https://cloud.revisium.io/endpoint/rest/my-org/frontend-config/master/head/FeatureFlag
+VITE_REVISIUM_PUBLIC_FEATURE_FLAG_TABLE_URL=http://localhost:9222/endpoint/rest/admin/frontend-config/master/head/tables/FeatureFlag/rows
 ```
-
-## React Shape
-
-```text
-src/
-  features/
-    flags/
-      flags-client.ts
-      FlagsProvider.tsx
-      useFlag.ts
-```
-
-The `FlagsProvider` should load flags once on app start, then refresh on a short interval only if the product needs near-real-time behavior.
 
 ## See and Manage Data
 
 - Admin UI: `http://localhost:9222`
 - Public feature endpoint:
-  `http://localhost:9222/endpoint/rest/admin/frontend-config/master/head/FeatureFlag`
-- MCP (optional): `http://localhost:9222/mcp`
-
-Use local revisium instances for schema and content edits. Use Cloud only for demo readers.
-
-## Run
-
-| Step | Command | Notes |
-| --- | --- | --- |
-| 1 | `npm install` | Install repo validation and bootstrap tooling |
-| 2 | `cp apps/react-feature-flags/.env.example apps/react-feature-flags/.env` | Fill one `REVISIUM_URL` |
-| 3 | `npx @revisium/standalone@latest` | Start writable local Revisium (`:9222`) |
-| 4 | `npm run bootstrap:react` | Create revisium tables and seed rows |
-| 5 | `cd apps/react-feature-flags/project && npm install` | Install app dependencies |
-| 6 | `npm run dev` | Starts the React app |
-| 7 | `curl -fsS http://localhost:3000` | Smoke test app UI loads |
-| 8 | `curl -fsS http://localhost:9222/endpoint/rest/admin/frontend-config/master/head/FeatureFlag` | Confirm row payload for local checks |
-
-```bash
-cp apps/react-feature-flags/.env.example apps/react-feature-flags/.env
-npm install
-# terminal 1
-npx @revisium/standalone@latest
-
-# terminal 2
-npm run bootstrap:react
-cd apps/react-feature-flags/project
-npm install
-npm run dev
-```
+  `http://localhost:9222/endpoint/rest/admin/frontend-config/master/head/tables/FeatureFlag/rows`
+- MCP endpoint: `http://localhost:9222/mcp`
 
 ## Verify
 
-Toggle a flag in Revisium, commit the revision, reload the React app, and confirm the UI changes.
+```bash
+curl -fsS -X POST http://localhost:9222/endpoint/rest/admin/frontend-config/master/head/tables/FeatureFlag/rows \
+  -H 'content-type: application/json' \
+  -d '{"first":10}'
+```
+
+Then toggle a flag in Revisium, commit the revision, reload the React app, and
+confirm the UI changes.
 
 ## Docs
 

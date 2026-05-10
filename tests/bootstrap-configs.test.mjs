@@ -137,6 +137,46 @@ function collectForeignKeys(schema, foreignKeys = []) {
   return foreignKeys;
 }
 
+function collectFormulaFieldsWithoutDefaults(schema, path, missing = []) {
+  if (!schema || typeof schema !== "object") {
+    return missing;
+  }
+
+  if (schema["x-formula"] && schema.default === undefined) {
+    missing.push(path);
+  }
+
+  for (const [propertyName, propertySchema] of Object.entries(schema.properties ?? {})) {
+    collectFormulaFieldsWithoutDefaults(propertySchema, path ? `${path}.${propertyName}` : propertyName, missing);
+  }
+
+  if (schema.items) {
+    collectFormulaFieldsWithoutDefaults(schema.items, `${path}[]`, missing);
+  }
+
+  return missing;
+}
+
+function collectObjectsWithoutRequired(schema, path, missing = []) {
+  if (!schema || typeof schema !== "object") {
+    return missing;
+  }
+
+  if (schema.type === "object" && !Array.isArray(schema.required)) {
+    missing.push(path);
+  }
+
+  for (const [propertyName, propertySchema] of Object.entries(schema.properties ?? {})) {
+    collectObjectsWithoutRequired(propertySchema, path ? `${path}.${propertyName}` : propertyName, missing);
+  }
+
+  if (schema.items) {
+    collectObjectsWithoutRequired(schema.items, `${path}[]`, missing);
+  }
+
+  return missing;
+}
+
 function validateRequiredData(schema, data, path) {
   for (const propertyName of schema.required ?? []) {
     assert.ok(Object.hasOwn(data, propertyName), `${path}.${propertyName} is required`);
@@ -253,6 +293,17 @@ test("application bootstrap configs have valid table, row, and endpoint referenc
 
     for (const table of config.tables) {
       assert.equal(table.schema.type, "object", `${example.id}/${table.id} schema must be an object`);
+
+      assert.deepEqual(
+        collectFormulaFieldsWithoutDefaults(table.schema, table.id),
+        [],
+        `${example.id}/${table.id} computed fields must define defaults for standalone schema validation`,
+      );
+      assert.deepEqual(
+        collectObjectsWithoutRequired(table.schema, table.id),
+        [],
+        `${example.id}/${table.id} object schemas must define required arrays for standalone schema validation`,
+      );
 
       for (const foreignKey of collectForeignKeys(table.schema)) {
         assert.ok(tableIds.has(foreignKey), `${example.id}/${table.id} foreignKey ${foreignKey} must target a table`);

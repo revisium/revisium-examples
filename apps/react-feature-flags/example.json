@@ -4,7 +4,7 @@
   "path": "apps/react-feature-flags",
   "category": "application",
   "status": "bootstrap",
-  "modes": ["standalone", "docker", "cloud"],
+  "modes": ["standalone"],
   "useCases": ["configuration-store", "frontend"],
   "docs": "https://docs.revisium.io/use-cases/configuration-store"
 }

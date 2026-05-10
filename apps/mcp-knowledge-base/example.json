@@ -4,7 +4,7 @@
   "path": "apps/mcp-knowledge-base",
   "category": "application",
   "status": "researched",
-  "modes": ["cloud", "standalone", "docker"],
+  "modes": ["standalone"],
   "useCases": ["ai-agent-memory", "knowledge-base", "mcp"],
   "docs": "https://docs.revisium.io/apis/mcp"
 }

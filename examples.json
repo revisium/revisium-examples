@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "title": "Revisium Examples",
-  "description": "Ready-to-run and reference examples for building with Revisium.",
+  "description": "Standalone-first examples for building with Revisium locally.",
   "examples": [
     {
       "id": "standalone",
@@ -14,42 +14,12 @@
       "docs": "https://docs.revisium.io/quick-start"
     },
     {
-      "id": "docker-compose",
-      "title": "Docker Compose Quickstart",
-      "path": "quickstarts/docker-compose",
-      "category": "quickstart",
-      "status": "reference",
-      "modes": ["docker"],
-      "useCases": ["local-development", "self-hosted"],
-      "docs": "https://docs.revisium.io/deployment"
-    },
-    {
-      "id": "docker-compose-s3",
-      "title": "Docker Compose With S3 And Redis",
-      "path": "quickstarts/docker-compose-s3",
-      "category": "quickstart",
-      "status": "reference",
-      "modes": ["docker"],
-      "useCases": ["files", "self-hosted"],
-      "docs": "https://docs.revisium.io/core-concepts/files"
-    },
-    {
-      "id": "cloud",
-      "title": "Revisium Cloud Quickstart",
-      "path": "quickstarts/cloud",
-      "category": "quickstart",
-      "status": "bootstrap",
-      "modes": ["cloud"],
-      "useCases": ["managed-cloud", "mcp", "generated-api"],
-      "docs": "https://docs.revisium.io/quick-start"
-    },
-    {
       "id": "nestjs-dictionary-service",
       "title": "NestJS Dictionary Service",
       "path": "apps/nestjs-dictionary-service",
       "category": "application",
       "status": "bootstrap",
-      "modes": ["standalone", "docker", "cloud"],
+      "modes": ["standalone"],
       "useCases": ["dictionary-service", "generated-api", "backend"],
       "docs": "https://docs.revisium.io/guides/dictionary-service-nestjs"
     },
@@ -59,7 +29,7 @@
       "path": "apps/nextjs-remote-config",
       "category": "application",
       "status": "bootstrap",
-      "modes": ["standalone", "docker", "cloud"],
+      "modes": ["standalone"],
       "useCases": ["configuration-store", "headless-cms", "nextjs"],
       "docs": "https://docs.revisium.io/use-cases/configuration-store"
     },
@@ -69,7 +39,7 @@
       "path": "apps/react-feature-flags",
       "category": "application",
       "status": "bootstrap",
-      "modes": ["standalone", "docker", "cloud"],
+      "modes": ["standalone"],
       "useCases": ["configuration-store", "frontend"],
       "docs": "https://docs.revisium.io/use-cases/configuration-store"
     },
@@ -79,39 +49,9 @@
       "path": "apps/mcp-knowledge-base",
       "category": "application",
       "status": "researched",
-      "modes": ["cloud", "standalone", "docker"],
+      "modes": ["standalone"],
       "useCases": ["ai-agent-memory", "knowledge-base", "mcp"],
       "docs": "https://docs.revisium.io/apis/mcp"
-    },
-    {
-      "id": "kubernetes-cloud",
-      "title": "Cloud On Kubernetes",
-      "path": "infrastructure/kubernetes/cloud",
-      "category": "infrastructure",
-      "status": "reference",
-      "modes": ["kubernetes"],
-      "useCases": ["self-hosted", "production"],
-      "docs": "https://docs.revisium.io/deployment"
-    },
-    {
-      "id": "external-postgres",
-      "title": "External PostgreSQL",
-      "path": "infrastructure/kubernetes/external-postgres",
-      "category": "infrastructure",
-      "status": "reference",
-      "modes": ["kubernetes"],
-      "useCases": ["database", "production"],
-      "docs": "https://docs.revisium.io/deployment"
-    },
-    {
-      "id": "s3-cdn",
-      "title": "S3 And CDN",
-      "path": "infrastructure/kubernetes/s3-cdn",
-      "category": "infrastructure",
-      "status": "reference",
-      "modes": ["docker", "kubernetes"],
-      "useCases": ["files", "cdn"],
-      "docs": "https://docs.revisium.io/core-concepts/files"
     }
   ]
 }

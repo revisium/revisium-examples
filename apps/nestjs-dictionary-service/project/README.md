@@ -21,12 +21,10 @@ Use one `REVISIUM_URL`, matching the Revisium CLI shape:
 revisium://[user:password@]host[:port]/organization/project/branch[:revision][?token=...|apikey=...]
 ```
 
-Examples:
+Standalone:
 
 ```env
-REVISIUM_URL=revisium://your-username:your-password@localhost:9222/admin/dictionary/master:head
-REVISIUM_URL=revisium://your-username:your-password@localhost:8080/admin/dictionary/master:head
-REVISIUM_URL=revisium://cloud.revisium.io/my-org/dictionary/master:head?apikey=rev_xxx
+REVISIUM_URL=revisium://admin:admin@localhost:9222/admin/dictionary/master:head
 ```
 
 ## Run

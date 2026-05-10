@@ -164,6 +164,10 @@ for (const [index, example] of examples.entries()) {
     errors.push(`${example.id} has unsupported status "${example.status}"`);
   }
 
+  if (!Array.isArray(example.modes) || example.modes.length !== 1 || example.modes[0] !== "standalone") {
+    errors.push(`${example.id} should only declare standalone mode in this repo`);
+  }
+
   const exampleDir = join(root, example.path ?? "");
   const readmePath = join(exampleDir, "README.md");
   const metadataPath = join(exampleDir, "example.json");
@@ -209,6 +213,9 @@ for (const [index, example] of examples.entries()) {
       }
       if (metadata.path !== example.path) {
         errors.push(`${example.path}/example.json path does not match examples.json`);
+      }
+      if (!Array.isArray(metadata.modes) || metadata.modes.length !== 1 || metadata.modes[0] !== "standalone") {
+        errors.push(`${example.path}/example.json should only declare standalone mode`);
       }
     }
   }

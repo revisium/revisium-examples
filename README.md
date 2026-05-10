@@ -1,103 +1,171 @@
 # Revisium Examples
 
-Quickstarts, bootstrap configs, and compact developer contexts for building with Revisium.
+Small standalone examples for building with Revisium locally.
 
-Use this repository when you want to see Revisium in a real application shape:
-
-- as a dictionary service for backend teams
-- as a remote configuration and feature-flag source
-- as a headless CMS or public content API
-- as an MCP-accessible knowledge base for AI agents
-- as a standalone, Docker, Kubernetes, or managed Cloud service
-
-The examples are intentionally small. Full framework applications should live in separate project repositories; this repo keeps the bootstrap config, environment contract, and minimal code context needed to understand each integration.
-For the built-out examples that live in this repo, the catalog files stay at `apps/<name>/` and the runnable app lives in `apps/<name>/project/`.
+Use this repo when you want to bootstrap demo data, run a small framework app,
+and inspect the result in the Revisium Admin UI. Every example targets one local
+Revisium Standalone process on `http://localhost:9222`.
 
 ## Start Here
 
-| Path | What it shows | Best first audience |
-| --- | --- | --- |
-| [`quickstarts/standalone`](./quickstarts/standalone) | Zero-config local Revisium with embedded storage | Any developer |
-| [`quickstarts/docker-compose`](./quickstarts/docker-compose) | Local Docker Compose with PostgreSQL | Backend developers |
-| [`quickstarts/cloud`](./quickstarts/cloud) | Managed Revisium Cloud project, API endpoint, and MCP access | Product teams, agents |
-| [`apps/nestjs-dictionary-service`](./apps/nestjs-dictionary-service) | NestJS reads typed reference data from Revisium | Backend teams |
-| [`apps/nextjs-remote-config`](./apps/nextjs-remote-config) | Next.js consumes runtime settings and public content | Web teams |
-| [`apps/react-feature-flags`](./apps/react-feature-flags) | React app reads flags without redeploying | Frontend teams |
-| [`apps/mcp-knowledge-base`](./apps/mcp-knowledge-base) | AI agent reads structured KB data through MCP | AI/product teams |
+| Path | What it shows |
+| --- | --- |
+| [`quickstarts/standalone`](./quickstarts/standalone) | Start local Revisium and manage data in the Admin UI |
+| [`apps/nestjs-dictionary-service`](./apps/nestjs-dictionary-service) | NestJS reads typed dictionary/reference data |
+| [`apps/nextjs-remote-config`](./apps/nextjs-remote-config) | Next.js reads runtime config and page copy |
+| [`apps/react-feature-flags`](./apps/react-feature-flags) | React reads public feature flags |
+| [`apps/mcp-knowledge-base`](./apps/mcp-knowledge-base) | MCP server reads a structured knowledge base |
 
-## Mode Matrix
+## Prerequisites
 
-Every application example should explain how to run against each supported Revisium mode.
+Install Node.js 22.13.0 or newer. Node.js includes `npm` and `npx`.
 
-| Mode | Endpoint shape | Use when |
-| --- | --- | --- |
-| Standalone | `http://localhost:9222` | Fastest local development and demos |
-| Docker Compose | `http://localhost:8080` | Local integration with PostgreSQL, Redis, or S3 |
-| Revisium Cloud | `https://cloud.revisium.io` | Managed environments, public demos, agent access |
-| Kubernetes | Environment-specific public or internal URL | Self-hosted staging and production |
+Check your version:
+
+```bash
+node --version
+npm --version
+```
 
 ## Run
 
-| Task | Command | Notes |
-| --- | --- | --- |
-| Install validation tools | `npm install` | Generates the lockfile and installs ESLint/test tooling |
-| Validate catalog, tests, and lint | `npm run validate` | Checks metadata, README sections, node:test tests, ESLint, and Sonar ESLint report |
-| Run standalone quickstart | `npx @revisium/standalone@latest` | See `quickstarts/standalone` |
-| Run Docker quickstart | `cd quickstarts/docker-compose && docker compose up -d` | Requires `.env` copied from `.env.example` |
-| Bootstrap NestJS demo data | `npm run bootstrap:nestjs` | Creates dictionary tables, rows, and generated endpoints |
-| Bootstrap Next.js demo data | `npm run bootstrap:nextjs` | Creates remote config tables, rows, and generated endpoints |
-| Bootstrap React demo data | `npm run bootstrap:react` | Creates feature flag tables, rows, and generated endpoints |
-| Bootstrap MCP KB demo data | `npm run bootstrap:mcp-kb` | Creates knowledge-base tables, rows, and generated endpoints |
+Install repo dependencies once:
 
-## Run multiple demos
+```bash
+npm install
+```
 
-The four application examples can share one local standalone process:
+Start Revisium Standalone in terminal 1:
 
-- Start one `npx @revisium/standalone@latest` session.
-- Point every example `REVISIUM_URL` at the same `localhost:9222` host.
-- Use different projects (`dictionary`, `web-config`, `frontend-config`, `knowledge-base`) to keep data isolated.
+```bash
+npx @revisium/standalone@latest
+```
 
-Check if standalone is already running:
+Open the Admin UI:
+
+```text
+http://localhost:9222
+```
+
+Default local credentials are `admin` / `admin`.
+
+Bootstrap demo data in terminal 2:
+
+```bash
+npm run bootstrap:nestjs
+npm run bootstrap:nextjs
+npm run bootstrap:react
+npm run bootstrap:mcp-kb
+```
+
+You can run one bootstrap command or all of them. Each demo uses a separate
+project under the local `admin` organization:
+
+| Command | Project |
+| --- | --- |
+| `npm run bootstrap:nestjs` | `dictionary` |
+| `npm run bootstrap:nextjs` | `web-config` |
+| `npm run bootstrap:react` | `frontend-config` |
+| `npm run bootstrap:mcp-kb` | `knowledge-base` |
+
+Stop standalone from terminal 1:
+
+```text
+Ctrl+C
+```
+
+## Run A Demo App
+
+Bootstrap the matching Revisium project first, then run the app from its
+`project/` folder.
+
+NestJS:
+
+```bash
+npm run bootstrap:nestjs
+cd apps/nestjs-dictionary-service/project
+cp .env.example .env
+npm install
+npm run build
+npm start
+```
+
+Next.js:
+
+```bash
+npm run bootstrap:nextjs
+cd apps/nextjs-remote-config/project
+cp .env.example .env
+npm install
+npm run dev
+```
+
+React:
+
+```bash
+npm run bootstrap:react
+cd apps/react-feature-flags/project
+cp .env.example .env
+npm install
+npm run dev
+```
+
+MCP knowledge base:
+
+```bash
+npm run bootstrap:mcp-kb
+cd apps/mcp-knowledge-base/project
+cp .env.example .env
+npm install
+npm run build
+npm start
+```
+
+## Check Standalone
+
+Check whether standalone is already running:
 
 ```bash
 curl -fsS http://localhost:9222 >/dev/null && echo "standalone is up" || echo "start standalone first"
-# Unix/Linux/macOS:
-lsof -iTCP:9222 -sTCP:LISTEN
-# Windows PowerShell:
-# Get-NetTCPConnection -LocalPort 9222 -State Listen
 ```
 
-If `npx @revisium/standalone@latest` returns `EADDRINUSE`, another process already owns `:9222`; reuse it rather than starting another one.
+Find the process that owns port `9222`:
+
+```bash
+lsof -iTCP:9222 -sTCP:LISTEN
+```
+
+If `npx @revisium/standalone@latest` returns `EADDRINUSE`, another standalone
+process is already running. Reuse it or stop it before starting a new one.
 
 ## Architecture
 
 ```mermaid
 flowchart TB
-  Catalog[examples.json] --> RootReadme[Root README]
-  Catalog --> Docs[docs.revisium.io Examples page]
-  Catalog --> Website[revisium.io Examples CTA]
-  Template[templates/example] --> Examples[Example folders]
-  Examples --> Quickstarts[Standalone, Docker, Cloud]
-  Examples --> Apps[NestJS, Next.js, React, MCP KB]
-  Examples --> Infra[Kubernetes, PostgreSQL, S3 CDN]
+  Dev[Developer terminal] --> Standalone[Revisium Standalone :9222]
+  Browser[Admin UI] --> Standalone
+  Bootstrap[Bootstrap scripts] --> Standalone
+  Apps[NestJS / Next.js / React / MCP] --> Standalone
+  Standalone --> Projects[(dictionary, web-config, frontend-config, knowledge-base)]
 ```
 
 ## Revisium Tables
-
-The repository itself does not create a Revisium project. Each app README must define its own table model.
 
 | Example | Project | Main tables |
 | --- | --- | --- |
 | `nestjs-dictionary-service` | `dictionary` | `FaqCategory`, `FaqItem`, `Country`, `Currency` |
 | `nextjs-remote-config` | `web-config` | `FeatureFlag`, `PageCopy`, `Plan` |
-| `react-feature-flags` | `frontend-config` | `FeatureFlag` |
-| `mcp-knowledge-base` | `knowledge-base` | `facts`, `decisions`, `tasks`, `modules` |
+| `react-feature-flags` | `frontend-config` | `FeatureFlag`, `AudienceSegment`, `Asset` |
+| `mcp-knowledge-base` | `knowledge-base` | `facts`, `decisions`, `tasks`, `blockers`, `sessions` |
 
 ## Verify
 
 ```bash
 npm run validate
 ```
+
+This checks the catalog, README sections, bootstrap configs, tests, ESLint, and
+Sonar ESLint export.
 
 ## Repository Layout
 
@@ -113,21 +181,10 @@ apps/
     project/
 
 quickstarts/
-  cloud/
-  docker-compose/
-  docker-compose-s3/
   standalone/
-
-infrastructure/
-  kubernetes/
-    cloud/
-    external-postgres/
-    s3-cdn/
 
 templates/
   example/
-  env/
-  secrets/
 ```
 
 ## Example Contract
@@ -136,26 +193,18 @@ Each example must include:
 
 - `README.md` following [`templates/example/README.md`](./templates/example/README.md)
 - `example.json` metadata for the website/docs catalog
+- standalone-only `modes: ["standalone"]`
 - application examples: `.env.example`, `bootstrap.config.json`, and `scripts/bootstrap.mjs`
-- runnable app examples: `project/README.md`, `project/package.json`, and source files under `project/src/`, `project/app/`, `project/pages/`, or another framework-standard source folder.
-- application `.env.example` files should use one `REVISIUM_URL` in `revisium://host/org/project/branch` format
-- framework app code should stay minimal here; full runnable apps belong in separate project repositories
+- runnable app examples: `project/README.md`, `project/package.json`, and source files under the framework-standard source folder
+- application `.env.example` files using one `REVISIUM_URL` in `revisium://user:password@host:port/org/project/branch` format
 - no real secrets or customer data
-- a clear list of supported modes: standalone, docker, cloud, or kubernetes
 - a verification command or manual smoke test
-
-Run the catalog check before opening a PR:
-
-```bash
-npm run validate
-```
 
 ## Docs And Website
 
 - [`docs/docs-and-website-integration.md`](./docs/docs-and-website-integration.md) defines how this repo should be linked from `docs.revisium.io` and `revisium.io`.
-- [`docs/marketing-strategy.md`](./docs/marketing-strategy.md) defines the examples-led marketing funnel.
 - [`docs/domain-demo-rules.md`](./docs/domain-demo-rules.md) defines what every application/domain demo must cover.
-- [`examples.json`](./examples.json) is the future single source for docs and landing-page cards.
+- [`examples.json`](./examples.json) is the catalog source for docs and landing-page cards.
 
 ## Related Repositories
 

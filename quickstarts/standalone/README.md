@@ -4,30 +4,22 @@ Run Revisium locally with one command and no external services.
 
 ## What This Shows
 
-- fastest local Revisium setup
-- embedded storage for demos and development
-- Admin UI, System API, generated APIs, and MCP from one local process
-
-## Supported Modes
-
-| Mode | URL | Notes |
-| --- | --- | --- |
-| Standalone | `http://localhost:9222` | This example's primary mode |
-
-Use Docker Compose when you need an external PostgreSQL container.
+- local Admin UI on `http://localhost:9222`
+- local System API, generated APIs, and MCP endpoint
+- writable demo projects for the app examples in this repo
 
 ## Prerequisites
 
-- Node.js 22+
-- npm or npx
+Install Node.js 22.13.0 or newer. Node.js includes `npm` and `npx`.
+
+```bash
+node --version
+npm --version
+```
 
 ## Run
 
-| Step | Command | Notes |
-| --- | --- | --- |
-| 1 | `npx @revisium/standalone@latest` | Starts Admin UI, APIs, and MCP on port `9222` |
-| 2 | Open `http://localhost:9222` | Create the demo project |
-| 3 | Commit revision | Makes `master/head` readable by generated endpoints |
+Start standalone in terminal 1:
 
 ```bash
 npx @revisium/standalone@latest
@@ -35,85 +27,74 @@ npx @revisium/standalone@latest
 
 Open:
 
-- Admin UI: `http://localhost:9222`
-- MCP endpoint: `http://localhost:9222/mcp`
+```text
+http://localhost:9222
+```
 
-Default local credentials are `admin` / `admin` unless overridden by environment variables.
+Default local credentials are `admin` / `admin`.
 
-### Multiple demos
-
-Use one Standalone process for multiple examples and keep it listening on `:9222`.
-Each app can target its own project under the same local org (`admin`) via different
-`REVISIUM_URL` values.
+Bootstrap demos from terminal 2:
 
 ```bash
-curl -fsS http://localhost:9222 >/dev/null && echo "standalone is already running" || echo "start standalone first"
-# Unix/Linux/macOS:
-lsof -iTCP:9222 -sTCP:LISTEN
-# Windows PowerShell:
-# Get-NetTCPConnection -LocalPort 9222 -State Listen
+npm install
+npm run bootstrap:nestjs
+npm run bootstrap:nextjs
+npm run bootstrap:react
+npm run bootstrap:mcp-kb
 ```
+
+Stop standalone from terminal 1:
+
+```text
+Ctrl+C
+```
+
+## Check Running Process
+
+```bash
+curl -fsS http://localhost:9222 >/dev/null && echo "standalone is up" || echo "start standalone first"
+lsof -iTCP:9222 -sTCP:LISTEN
+```
+
+If port `9222` is already in use, reuse that standalone process or stop it before
+starting a new one.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-  Browser[Admin UI] --> Standalone[Standalone process]
-  CLI[CLI or curl] --> Standalone
+  Terminal[Terminal] --> Standalone[Revisium Standalone :9222]
+  Browser[Admin UI] --> Standalone
+  Bootstrap[Bootstrap scripts] --> Standalone
   Agent[AI agent] --> MCP[MCP endpoint]
   MCP --> Standalone
-  Standalone --> Store[(Embedded local data)]
-  Standalone --> APIs[System API and generated APIs]
+  Standalone --> Store[(Local data)]
 ```
 
 ## Revisium Tables
 
-Create this minimum demo model:
+The app examples create these local projects:
 
-| Table | Fields | Notes |
-| --- | --- | --- |
-| `FeatureFlag` | `enabled`, `rollout`, `description` | Remote config and feature flag demo |
-| `PageCopy` | `title`, `body` | Optional headless CMS/content demo |
+| Project | Main tables |
+| --- | --- |
+| `dictionary` | `FaqCategory`, `FaqItem`, `Country`, `Currency` |
+| `web-config` | `FeatureFlag`, `PageCopy`, `Plan` |
+| `frontend-config` | `FeatureFlag`, `AudienceSegment`, `Asset` |
+| `knowledge-base` | `facts`, `decisions`, `tasks`, `blockers`, `sessions` |
 
-Minimal `FeatureFlag` schema:
+## Create Data Manually
 
-```json
-{
-  "type": "object",
-  "properties": {
-    "enabled": { "type": "boolean", "default": false },
-    "rollout": { "type": "number", "default": 0 },
-    "description": { "type": "string", "default": "" }
-  },
-  "required": ["enabled", "rollout", "description"],
-  "additionalProperties": false
-}
-```
-
-## Create A Demo Project
-
-1. Open the Admin UI.
-2. Create organization `admin` and project `demo`.
-3. Create a table, for example `FeatureFlag`.
-4. Commit the revision.
-5. Enable a generated REST or GraphQL endpoint from the Endpoints screen.
-
-## MCP
-
-```bash
-claude mcp add --transport http revisium-local http://localhost:9222/mcp
-```
-
-Use the MCP tools to inspect tables and rows:
-
-```text
-get_tables(uri: "admin/demo/master:head")
-search_rows(uri: "admin/demo/master:head", query: "flag")
-```
+1. Open `http://localhost:9222`.
+2. Sign in with `admin` / `admin`.
+3. Create a project.
+4. Create tables and rows.
+5. Commit the revision so generated endpoints can read `master/head`.
 
 ## Verify
 
-Open the Admin UI and confirm you can create a project and commit a revision.
+```bash
+curl -fsS http://localhost:9222 >/dev/null && echo "standalone is up"
+```
 
 ## Docs
 

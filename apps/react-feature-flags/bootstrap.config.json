@@ -1,21 +1,40 @@
 {
-  "defaultUrl": "revisium://localhost:9222/admin/frontend-config/master",
+  "defaultUrl": "revisium://admin:admin@localhost:9222/admin/frontend-config/master",
   "organizationId": "admin",
   "projectName": "frontend-config",
   "branchName": "master",
   "commitMessage": "Bootstrap React feature flags example",
-  "endpoints": ["REST_API", "GRAPHQL"],
+  "endpoints": [
+    "REST_API",
+    "GRAPHQL"
+  ],
   "tables": [
     {
       "id": "AudienceSegment",
       "schema": {
         "type": "object",
         "properties": {
-          "name": { "type": "string", "default": "" },
-          "description": { "type": "string", "default": "" },
-          "countries": { "type": "array", "items": { "type": "string", "default": "" } }
+          "name": {
+            "type": "string",
+            "default": ""
+          },
+          "description": {
+            "type": "string",
+            "default": ""
+          },
+          "countries": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "default": ""
+            }
+          }
         },
-        "required": ["name", "description", "countries"],
+        "required": [
+          "name",
+          "description",
+          "countries"
+        ],
         "additionalProperties": false
       }
     },
@@ -24,10 +43,17 @@
       "schema": {
         "type": "object",
         "properties": {
-          "title": { "type": "string", "default": "" },
-          "file": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" }
+          "title": {
+            "type": "string",
+            "default": ""
+          },
+          "file": {
+            "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0"
+          }
         },
-        "required": ["title"],
+        "required": [
+          "title"
+        ],
         "additionalProperties": false
       }
     },
@@ -36,27 +62,63 @@
       "schema": {
         "type": "object",
         "properties": {
-          "enabled": { "type": "boolean", "default": false },
-          "rollout": { "type": "number", "default": 0 },
-          "description": { "type": "string", "default": "" },
-          "owner": { "type": "string", "default": "" },
-          "defaultSegmentId": { "type": "string", "default": "", "foreignKey": "AudienceSegment" },
+          "enabled": {
+            "type": "boolean",
+            "default": false
+          },
+          "rollout": {
+            "type": "number",
+            "default": 0
+          },
+          "description": {
+            "type": "string",
+            "default": ""
+          },
+          "owner": {
+            "type": "string",
+            "default": ""
+          },
+          "defaultSegmentId": {
+            "type": "string",
+            "default": "",
+            "foreignKey": "AudienceSegment"
+          },
           "segmentIds": {
             "type": "array",
-            "items": { "type": "string", "default": "", "foreignKey": "AudienceSegment" }
+            "items": {
+              "type": "string",
+              "default": "",
+              "foreignKey": "AudienceSegment"
+            }
           },
-          "environments": { "type": "array", "items": { "type": "string", "default": "" } },
+          "environments": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "default": ""
+            }
+          },
           "targeting": {
             "type": "object",
             "properties": {
-              "ownerSegmentId": { "type": "string", "default": "", "foreignKey": "AudienceSegment" },
+              "ownerSegmentId": {
+                "type": "string",
+                "default": "",
+                "foreignKey": "AudienceSegment"
+              },
               "summary": {
                 "type": "string",
                 "readOnly": true,
-                "x-formula": { "version": 1, "expression": "ownerSegmentId + \":\" + /owner" }
+                "x-formula": {
+                  "version": 1,
+                  "expression": "ownerSegmentId + \":\" + /owner"
+                },
+                "default": ""
               }
             },
-            "required": ["ownerSegmentId"],
+            "required": [
+              "ownerSegmentId"
+            ],
             "additionalProperties": false
           },
           "rules": {
@@ -64,47 +126,80 @@
             "items": {
               "type": "object",
               "properties": {
-                "segmentId": { "type": "string", "default": "", "foreignKey": "AudienceSegment" },
-                "weight": { "type": "number", "default": 0 },
+                "segmentId": {
+                  "type": "string",
+                  "default": "",
+                  "foreignKey": "AudienceSegment"
+                },
+                "weight": {
+                  "type": "number",
+                  "default": 0
+                },
                 "position": {
                   "type": "number",
                   "readOnly": true,
-                  "x-formula": { "version": 1, "expression": "#index + 1" }
+                  "x-formula": {
+                    "version": 1,
+                    "expression": "#index + 1"
+                  },
+                  "default": 0
                 }
               },
-              "required": ["segmentId", "weight"],
+              "required": [
+                "segmentId",
+                "weight"
+              ],
               "additionalProperties": false
             }
           },
           "ui": {
             "type": "object",
             "properties": {
-              "bannerImage": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" },
+              "bannerImage": {
+                "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0"
+              },
               "gallery": {
                 "type": "array",
-                "items": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" }
+                "items": {
+                  "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0"
+                }
               }
             },
-            "additionalProperties": false
+            "additionalProperties": false,
+            "required": []
           },
           "assets": {
             "type": "array",
-            "items": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" }
+            "items": {
+              "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0"
+            }
           },
           "isFullyRolledOut": {
             "type": "boolean",
             "readOnly": true,
-            "x-formula": { "version": 1, "expression": "enabled && rollout >= 100" }
+            "x-formula": {
+              "version": 1,
+              "expression": "enabled && rollout >= 100"
+            },
+            "default": false
           },
           "primaryEnvironment": {
             "type": "string",
             "readOnly": true,
-            "x-formula": { "version": 1, "expression": "environments[0]" }
+            "x-formula": {
+              "version": 1,
+              "expression": "environments[0]"
+            },
+            "default": ""
           },
           "totalRuleWeight": {
             "type": "number",
             "readOnly": true,
-            "x-formula": { "version": 1, "expression": "sum(rules[*].weight)" }
+            "x-formula": {
+              "version": 1,
+              "expression": "sum(rules[*].weight)"
+            },
+            "default": 0
           }
         },
         "required": [
@@ -126,12 +221,21 @@
     {
       "tableId": "AudienceSegment",
       "rowId": "public",
-      "data": { "name": "Public users", "description": "All public visitors", "countries": ["US", "TH"] }
+      "data": {
+        "name": "Public users",
+        "description": "All public visitors",
+        "countries": [
+          "US",
+          "TH"
+        ]
+      }
     },
     {
       "tableId": "Asset",
       "rowId": "checkout-banner",
-      "data": { "title": "Checkout banner" }
+      "data": {
+        "title": "Checkout banner"
+      }
     },
     {
       "tableId": "FeatureFlag",
@@ -142,10 +246,22 @@
         "description": "Enable checkout v2",
         "owner": "growth",
         "defaultSegmentId": "public",
-        "segmentIds": ["public"],
-        "environments": ["dev", "staging"],
-        "targeting": { "ownerSegmentId": "public" },
-        "rules": [{ "segmentId": "public", "weight": 25 }]
+        "segmentIds": [
+          "public"
+        ],
+        "environments": [
+          "dev",
+          "staging"
+        ],
+        "targeting": {
+          "ownerSegmentId": "public"
+        },
+        "rules": [
+          {
+            "segmentId": "public",
+            "weight": 25
+          }
+        ]
       }
     }
   ]

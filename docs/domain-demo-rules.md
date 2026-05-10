@@ -1,6 +1,7 @@
 # Domain Demo Rules
 
-Application examples should be real domain demos, not isolated API snippets. Each domain should show enough Revisium capability that a reader understands what the platform can model.
+Application examples should be real domain demos, not isolated API snippets.
+Each example should be easy to run locally with Revisium Standalone.
 
 ## Domain Naming
 
@@ -13,26 +14,21 @@ Use one clear business domain per application example.
 | React Feature Flags | Client-visible rollout config | `frontend-config` |
 | MCP Knowledge Base | Agent memory and structured knowledge | `knowledge-base` |
 
-Use safe documented hosts:
-
-| Mode | Host |
-| --- | --- |
-| Standalone | `http://localhost:9222` |
-| Docker Compose | `http://localhost:8080` |
-| Revisium Cloud | `https://cloud.revisium.io` |
-| Self-hosted docs | `https://cloud.example.com`, `https://cdn.example.com` |
+Use `http://localhost:9222` for examples in this repo.
 
 ## Status Values
 
 | Status | Meaning |
 | --- | --- |
 | `bootstrap` | Example has documented bootstrap inputs and is ready for local seed-data creation |
-| `reference` | Example documents an integration or deployment shape but does not create app data |
-| `researched` | Example is based on a live or existing Revisium project shape and may mirror its naming |
+| `reference` | Example documents a shape but does not create app data |
+| `researched` | Example is based on an existing Revisium project shape and may mirror its naming |
 
 ## Implementation Depth
 
-Keep application examples in this repository small. They should show the Revisium schema, seed data, environment contract, and a compact developer code context. Full runnable framework applications should be created as separate project repositories and linked from the relevant README when they exist.
+Keep application examples in this repository small. They should show the
+Revisium schema, seed data, environment contract, and compact app code needed to
+understand the integration.
 
 ## Required Capability Coverage
 
@@ -58,13 +54,11 @@ Each application example README must include `## Capability Coverage` with this 
 | Generated API | Read path through generated REST or GraphQL |
 | MCP | At least one read or search path through MCP |
 
-If a capability is intentionally out of scope for an example, mark it as `Not covered` and explain where it is covered instead. Public-marketing-ready examples should avoid `Not covered` entries.
-
 ## Table Design Rules
 
 - Prefer realistic domain names over generic `DemoTable`.
 - Use plural-free table names when they represent row types, for example `FeatureFlag`, `FaqItem`, `Asset`.
-- Examples that intentionally mirror a live project may keep that project's table naming, for example lowercase plural KB tables.
+- Examples that intentionally mirror an existing project may keep that project's table naming, for example lowercase plural KB tables.
 - Keep FK fields explicit: `categoryId`, `ownerId`, `productId`.
 - Use nested objects only where the domain naturally has structure.
 - Use arrays to demonstrate both data modeling and generated API shape.

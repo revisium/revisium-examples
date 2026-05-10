@@ -1,20 +1,30 @@
 {
-  "defaultUrl": "revisium://localhost:9222/admin/knowledge-base/master",
+  "defaultUrl": "revisium://admin:admin@localhost:9222/admin/knowledge-base/master",
   "organizationId": "admin",
   "projectName": "knowledge-base",
   "branchName": "master",
   "commitMessage": "Bootstrap MCP knowledge base example",
-  "endpoints": ["REST_API", "GRAPHQL"],
+  "endpoints": [
+    "REST_API",
+    "GRAPHQL"
+  ],
   "tables": [
     {
       "id": "attachments",
       "schema": {
         "type": "object",
         "properties": {
-          "title": { "type": "string", "default": "" },
-          "file": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" }
+          "title": {
+            "type": "string",
+            "default": ""
+          },
+          "file": {
+            "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0"
+          }
         },
-        "required": ["title"],
+        "required": [
+          "title"
+        ],
         "additionalProperties": false
       }
     },
@@ -23,31 +33,73 @@
       "schema": {
         "type": "object",
         "properties": {
-          "topic": { "type": "string", "default": "" },
-          "source": { "type": "string", "default": "" },
-          "content": { "type": "string", "default": "", "contentMediaType": "text/markdown" },
-          "category": { "type": "string", "default": "" },
-          "verified": { "type": "boolean", "default": false },
-          "confidence": { "type": "number", "default": 0 },
-          "tags": { "type": "array", "items": { "type": "string", "default": "" } },
+          "topic": {
+            "type": "string",
+            "default": ""
+          },
+          "source": {
+            "type": "string",
+            "default": ""
+          },
+          "content": {
+            "type": "string",
+            "default": "",
+            "contentMediaType": "text/markdown"
+          },
+          "category": {
+            "type": "string",
+            "default": ""
+          },
+          "verified": {
+            "type": "boolean",
+            "default": false
+          },
+          "confidence": {
+            "type": "number",
+            "default": 0
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "default": ""
+            }
+          },
           "evidence": {
             "type": "object",
             "properties": {
-              "primaryFile": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" }
+              "primaryFile": {
+                "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0"
+              }
             },
-            "additionalProperties": false
+            "additionalProperties": false,
+            "required": []
           },
           "attachments": {
             "type": "array",
-            "items": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" }
+            "items": {
+              "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0"
+            }
           },
           "qualityScore": {
             "type": "number",
             "readOnly": true,
-            "x-formula": { "version": 1, "expression": "confidence * 100" }
+            "x-formula": {
+              "version": 1,
+              "expression": "confidence * 100"
+            },
+            "default": 0
           }
         },
-        "required": ["topic", "source", "content", "category", "verified", "confidence", "tags"],
+        "required": [
+          "topic",
+          "source",
+          "content",
+          "category",
+          "verified",
+          "confidence",
+          "tags"
+        ],
         "additionalProperties": false
       }
     },
@@ -56,17 +108,45 @@
       "schema": {
         "type": "object",
         "properties": {
-          "date": { "type": "string", "default": "" },
-          "title": { "type": "string", "default": "" },
-          "status": { "type": "string", "default": "" },
-          "context": { "type": "string", "default": "", "contentMediaType": "text/markdown" },
-          "decision": { "type": "string", "default": "", "contentMediaType": "text/markdown" },
+          "date": {
+            "type": "string",
+            "default": ""
+          },
+          "title": {
+            "type": "string",
+            "default": ""
+          },
+          "status": {
+            "type": "string",
+            "default": ""
+          },
+          "context": {
+            "type": "string",
+            "default": "",
+            "contentMediaType": "text/markdown"
+          },
+          "decision": {
+            "type": "string",
+            "default": "",
+            "contentMediaType": "text/markdown"
+          },
           "supportingFacts": {
             "type": "array",
-            "items": { "type": "string", "default": "", "foreignKey": "facts" }
+            "items": {
+              "type": "string",
+              "default": "",
+              "foreignKey": "facts"
+            }
           }
         },
-        "required": ["date", "title", "status", "context", "decision", "supportingFacts"],
+        "required": [
+          "date",
+          "title",
+          "status",
+          "context",
+          "decision",
+          "supportingFacts"
+        ],
         "additionalProperties": false
       }
     },
@@ -75,19 +155,43 @@
       "schema": {
         "type": "object",
         "properties": {
-          "title": { "type": "string", "default": "" },
-          "status": { "type": "string", "default": "" },
-          "description": { "type": "string", "default": "", "contentMediaType": "text/markdown" },
+          "title": {
+            "type": "string",
+            "default": ""
+          },
+          "status": {
+            "type": "string",
+            "default": ""
+          },
+          "description": {
+            "type": "string",
+            "default": "",
+            "contentMediaType": "text/markdown"
+          },
           "relatedFacts": {
             "type": "array",
-            "items": { "type": "string", "default": "", "foreignKey": "facts" }
+            "items": {
+              "type": "string",
+              "default": "",
+              "foreignKey": "facts"
+            }
           },
           "relatedDecisions": {
             "type": "array",
-            "items": { "type": "string", "default": "", "foreignKey": "decisions" }
+            "items": {
+              "type": "string",
+              "default": "",
+              "foreignKey": "decisions"
+            }
           }
         },
-        "required": ["title", "status", "description", "relatedFacts", "relatedDecisions"],
+        "required": [
+          "title",
+          "status",
+          "description",
+          "relatedFacts",
+          "relatedDecisions"
+        ],
         "additionalProperties": false
       }
     },
@@ -96,11 +200,25 @@
       "schema": {
         "type": "object",
         "properties": {
-          "title": { "type": "string", "default": "" },
-          "path": { "type": "string", "default": "" },
-          "content": { "type": "string", "default": "", "contentMediaType": "text/markdown" }
+          "title": {
+            "type": "string",
+            "default": ""
+          },
+          "path": {
+            "type": "string",
+            "default": ""
+          },
+          "content": {
+            "type": "string",
+            "default": "",
+            "contentMediaType": "text/markdown"
+          }
         },
-        "required": ["title", "path", "content"],
+        "required": [
+          "title",
+          "path",
+          "content"
+        ],
         "additionalProperties": false
       }
     },
@@ -109,11 +227,25 @@
       "schema": {
         "type": "object",
         "properties": {
-          "title": { "type": "string", "default": "" },
-          "status": { "type": "string", "default": "" },
-          "relatedTask": { "type": "string", "default": "", "foreignKey": "tasks" }
+          "title": {
+            "type": "string",
+            "default": ""
+          },
+          "status": {
+            "type": "string",
+            "default": ""
+          },
+          "relatedTask": {
+            "type": "string",
+            "default": "",
+            "foreignKey": "tasks"
+          }
         },
-        "required": ["title", "status", "relatedTask"],
+        "required": [
+          "title",
+          "status",
+          "relatedTask"
+        ],
         "additionalProperties": false
       }
     },
@@ -122,14 +254,27 @@
       "schema": {
         "type": "object",
         "properties": {
-          "date": { "type": "string", "default": "" },
-          "summary": { "type": "string", "default": "", "contentMediaType": "text/markdown" },
+          "date": {
+            "type": "string",
+            "default": ""
+          },
+          "summary": {
+            "type": "string",
+            "default": "",
+            "contentMediaType": "text/markdown"
+          },
           "context": {
             "type": "object",
             "properties": {
-              "primaryDecisionId": { "type": "string", "default": "", "foreignKey": "decisions" }
+              "primaryDecisionId": {
+                "type": "string",
+                "default": "",
+                "foreignKey": "decisions"
+              }
             },
-            "required": ["primaryDecisionId"],
+            "required": [
+              "primaryDecisionId"
+            ],
             "additionalProperties": false
           },
           "tasksCompleted": {
@@ -137,9 +282,15 @@
             "items": {
               "type": "object",
               "properties": {
-                "taskId": { "type": "string", "default": "", "foreignKey": "tasks" }
+                "taskId": {
+                  "type": "string",
+                  "default": "",
+                  "foreignKey": "tasks"
+                }
               },
-              "required": ["taskId"],
+              "required": [
+                "taskId"
+              ],
               "additionalProperties": false
             }
           },
@@ -149,33 +300,54 @@
               "doneCount": {
                 "type": "number",
                 "readOnly": true,
-                "x-formula": { "version": 1, "expression": "count(tasksCompleted)" }
+                "x-formula": {
+                  "version": 1,
+                  "expression": "count(/tasksCompleted)"
+                },
+                "default": 0
               }
             },
-            "additionalProperties": false
+            "additionalProperties": false,
+            "required": []
           },
           "evidence": {
             "type": "object",
             "properties": {
               "files": {
                 "type": "array",
-                "items": { "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0" }
+                "items": {
+                  "$ref": "urn:jsonschema:io:revisium:file-schema:1.0.0"
+                }
               }
             },
-            "additionalProperties": false
+            "additionalProperties": false,
+            "required": []
           },
           "firstCompletedTaskId": {
             "type": "string",
             "readOnly": true,
-            "x-formula": { "version": 1, "expression": "tasksCompleted[0].taskId" }
+            "x-formula": {
+              "version": 1,
+              "expression": "tasksCompleted[0].taskId"
+            },
+            "default": ""
           },
           "totalLinkedItems": {
             "type": "number",
             "readOnly": true,
-            "x-formula": { "version": 1, "expression": "count(tasksCompleted)" }
+            "x-formula": {
+              "version": 1,
+              "expression": "count(tasksCompleted)"
+            },
+            "default": 0
           }
         },
-        "required": ["date", "summary", "context", "tasksCompleted"],
+        "required": [
+          "date",
+          "summary",
+          "context",
+          "tasksCompleted"
+        ],
         "additionalProperties": false
       }
     }
@@ -191,7 +363,10 @@
         "category": "mcp",
         "verified": true,
         "confidence": 0.9,
-        "tags": ["mcp", "agent"]
+        "tags": [
+          "mcp",
+          "agent"
+        ]
       }
     },
     {
@@ -203,7 +378,9 @@
         "status": "accepted",
         "context": "Agents need typed knowledge with review.",
         "decision": "Store facts and decisions in Revisium tables.",
-        "supportingFacts": ["mcp-access"]
+        "supportingFacts": [
+          "mcp-access"
+        ]
       }
     },
     {
@@ -213,8 +390,12 @@
         "title": "Bootstrap KB",
         "status": "done",
         "description": "Create tables and seed initial rows.",
-        "relatedFacts": ["mcp-access"],
-        "relatedDecisions": ["use-revisium-kb"]
+        "relatedFacts": [
+          "mcp-access"
+        ],
+        "relatedDecisions": [
+          "use-revisium-kb"
+        ]
       }
     },
     {
@@ -232,8 +413,14 @@
       "data": {
         "date": "2026-05-09",
         "summary": "Initial KB bootstrap completed.",
-        "context": { "primaryDecisionId": "use-revisium-kb" },
-        "tasksCompleted": [{ "taskId": "bootstrap-kb" }]
+        "context": {
+          "primaryDecisionId": "use-revisium-kb"
+        },
+        "tasksCompleted": [
+          {
+            "taskId": "bootstrap-kb"
+          }
+        ]
       }
     }
   ]
